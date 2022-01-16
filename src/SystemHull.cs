@@ -36,19 +36,26 @@ public abstract class SystemModuleForTime : SystemModule
 
 public abstract class SystemModuleForRender : SystemModule
 {
+	public abstract Resource.IPolygon CreatePolygon(params Vector2[] args);
+	public abstract Resource.ICircle CraeteCircle(float radius);
+	public abstract Resource.IColor CreateColor(byte a, byte r, byte g, byte b);
 	
+	public abstract void RenderColorPolygon(Resource.IPolygon p, Resource.IColor color, Vector2 pos, Vector2 scale);
+	public abstract void RenderColorPolygon(Resource.IPolygon p, Resource.IColor color, Vector2 pos, Vector2 scale, float angle);
+	public abstract void RenderColorCircle(Resource.ICircle c, Resource.IColor color, Vector2 pos, Vector2 scale);
 }
 
 public class SystemHull
 {
 	public readonly SystemModuleForWindow Window;
 	public readonly SystemModuleForTime Time;
+	public readonly SystemModuleForRender Render;
 	
 	public readonly List<SystemModule> Modules;
 	
 	public event VoidMethod Loop;
 	
-	public SystemHull(SystemModuleForWindow window, SystemModuleForTime time, params SystemModule[] args)
+	public SystemHull(SystemModuleForWindow window, SystemModuleForTime time, SystemModuleForRender render, params SystemModule[] args)
 	{
 		uint give_id = 0;
 		LoopOrder loop_order = new LoopOrder();
@@ -56,9 +63,11 @@ public class SystemHull
 		
 		Window = window;
 		Time = time;
+		Render = render;
 		
 		Modules.Add(Window);
 		Modules.Add(Time);
+		Modules.Add(Render);
 		Modules.AddRange(args);
 		
 		//	Link & Set ID
@@ -75,6 +84,11 @@ public class SystemHull
 		//	Set Loop
 		loop_order.InputTo(ref this.Loop);
 		loop_order = null;
+	}
+	
+	public void Exit()
+	{
+		this.Loop = null;
 	}
 	
 	public void Run()
@@ -98,8 +112,9 @@ public class SystemHull
 			Modules[i].OnDispose();
 		
 		Window.Exit();
-		
 		Modules.Clear();
+		
+		System.Diagnostics.Process.GetCurrentProcess().Kill();
 	}
 }
 

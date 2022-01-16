@@ -14,3 +14,8 @@ public interface IDispose
 {
 	void Dispose();
 }
+
+public interface IDeepCopy<T>
+{
+	T Copy();
+}

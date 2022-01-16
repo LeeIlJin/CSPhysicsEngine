@@ -46,6 +46,20 @@ public struct Vector2
 	
 	public float Length(){ return (float)Math.Sqrt(x * x + y * y); }
 	public float LengthSquared(){ return x * x + y * y; }
+	public void MaxClamp()
+	{
+		if(x > y)
+			y = x;
+		else
+			x = y;
+	}
+	public void MinClamp()
+	{
+		if(x < y)
+			y = x;
+		else
+			x = y;
+	}
 	public Vector2 Normalize()
 	{
 		float length = this.Length();

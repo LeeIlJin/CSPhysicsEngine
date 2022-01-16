@@ -10,7 +10,8 @@ internal class EntryPoint
 		SystemHull hull = new SystemHull
 		(
 			new Module.FormModule( Module.FormModule.Desc.Default ),
-			new Module.TimeModule( 1000 )
+			new Module.TimeModule( 1000 ),
+			new Module.GDIRenderModule()
 		);
 		hull.Run();
 		
