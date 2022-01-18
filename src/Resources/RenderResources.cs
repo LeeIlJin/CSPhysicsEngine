@@ -2,18 +2,18 @@ using System;
 
 namespace Resource
 {
-	public interface IPolygon
+	public interface IPolygon : IDispose
 	{
-		int Length();
+		int VertexCount();
 		Vector2 Vertex(int i);
 	}
 	
-	public interface ICircle
+	public interface ICircle : IDispose
 	{
 		float Radius();
 	}
 	
-	public interface IColor
+	public interface IColor : IDispose
 	{
 		byte A();
 		byte R();

@@ -1,65 +1,69 @@
 using System;
 using System.Collections.Generic;
 
-public abstract class SystemModule
+namespace Module
 {
-	public SystemHull Hull{ get; internal set; }
-	public uint ModuleID{ get; internal set; }
+	public abstract class Base
+	{
+		public SystemHull Hull{ get; internal set; }
+		public uint ModuleID{ get; internal set; }
+		
+		public abstract void OnCreate(LoopOrder loop_order);
+		public abstract void OnBegin();
+		public abstract void OnEnd();
+		public abstract void OnDispose();
+	}
 	
-	public abstract void OnCreate(LoopOrder loop_order);
-	public abstract void OnBegin();
-	public abstract void OnEnd();
-	public abstract void OnDispose();
-}
-
-public abstract class SystemModuleForWindow : SystemModule
-{
-	public abstract int Width();
-	public abstract int Height();
-	public abstract void Show();
-	public abstract bool IsCreated();
-	public abstract void Exit();
-}
-
-public abstract class SystemModuleForTime : SystemModule
-{
-	public abstract float Delta();
-	public abstract int DeltaMs();
-	public abstract int Fps();
-	public abstract float Global();
+	public abstract class WindowBase : Module.Base
+	{
+		public abstract int Width();
+		public abstract int Height();
+		public abstract void Show();
+		public abstract bool IsCreated();
+		public abstract void Exit();
+	}
 	
-	public abstract string StrDelta();
-	public abstract string StrDeltaMs();
-	public abstract string StrFps();
-	public abstract string StrGlobal();
-}
-
-public abstract class SystemModuleForRender : SystemModule
-{
-	public abstract Resource.IPolygon CreatePolygon(params Vector2[] args);
-	public abstract Resource.ICircle CraeteCircle(float radius);
-	public abstract Resource.IColor CreateColor(byte a, byte r, byte g, byte b);
+	public abstract class TimeBase : Module.Base
+	{
+		public abstract float Delta();
+		public abstract int DeltaMs();
+		public abstract int Fps();
+		public abstract float Global();
+	}
 	
-	public abstract void RenderColorPolygon(Resource.IPolygon p, Resource.IColor color, Vector2 pos, Vector2 scale);
-	public abstract void RenderColorPolygon(Resource.IPolygon p, Resource.IColor color, Vector2 pos, Vector2 scale, float angle);
-	public abstract void RenderColorCircle(Resource.ICircle c, Resource.IColor color, Vector2 pos, Vector2 scale);
+	public abstract class RenderBase : Module.Base
+	{
+		public abstract Resource.IPolygon CreatePolygon(params Vector2[] args);
+		public abstract Resource.ICircle CraeteCircle(float radius);
+		public abstract Resource.IColor CreateColor(byte a, byte r, byte g, byte b);
+		
+		public abstract void RenderColorPolygon(Resource.IPolygon p, Resource.IColor color, Vector2 pos, Vector2 scale);
+		public abstract void RenderColorPolygon(Resource.IPolygon p, Resource.IColor color, Vector2 pos, Vector2 scale, float angle);
+		public abstract void RenderColorCircle(Resource.ICircle c, Resource.IColor color, Vector2 pos, Vector2 scale);
+	}
 }
 
 public class SystemHull
 {
-	public readonly SystemModuleForWindow Window;
-	public readonly SystemModuleForTime Time;
-	public readonly SystemModuleForRender Render;
+	public readonly Module.WindowBase Window;
+	public readonly Module.TimeBase Time;
+	public readonly Module.RenderBase Render;
 	
-	public readonly List<SystemModule> Modules;
+	public readonly List<Module.Base> Modules;
 	
 	public event VoidMethod Loop;
 	
-	public SystemHull(SystemModuleForWindow window, SystemModuleForTime time, SystemModuleForRender render, params SystemModule[] args)
+	public SystemHull
+	(
+		Module.WindowBase window,
+		Module.TimeBase time,
+		Module.RenderBase render,
+		params Module.Base[] args
+	)
 	{
 		uint give_id = 0;
 		LoopOrder loop_order = new LoopOrder();
-		Modules = new List<SystemModule>();
+		Modules = new List<Module.Base>();
 		
 		Window = window;
 		Time = time;
@@ -71,7 +75,7 @@ public class SystemHull
 		Modules.AddRange(args);
 		
 		//	Link & Set ID
-		foreach(SystemModule m in Modules)
+		foreach(Module.Base m in Modules)
 		{
 			m.Hull = this;
 			m.ModuleID = give_id++;

@@ -2,8 +2,9 @@ using System;
 
 namespace Module
 {
-	public sealed class TimeModule : SystemModuleForTime
+	public sealed class TickTime : Module.TimeBase
 	{
+		//	Field ===============================================================================
 		private TickTimer frame_timer;
 		
 		private int fps;
@@ -14,7 +15,7 @@ namespace Module
 		private int frame_time_ms;
 		private float global_time_s;
 		
-		public TimeModule(int ms)
+		public TickTime(int ms)
 		{
 			frame_timer = new TickTimer();
 			
@@ -46,7 +47,7 @@ namespace Module
 			}
 		}
 		
-		//	Module's
+		//	Base's ==============================================================================
 		public override void OnCreate(LoopOrder loop_order)
 		{
 			loop_order.Add(this.Begin,0);
@@ -59,15 +60,11 @@ namespace Module
 			frame_timer = null;
 		}
 		
-		//	Time's
+		//	Time's ==============================================================================
 		public override float Delta(){ return frame_timer.tick_s; }
 		public override int DeltaMs(){ return frame_timer.tick_ms; }
 		public override int Fps(){ return fps; }
 		public override float Global(){ return global_time_s; }
 		
-		public override string StrDelta(){ return string.Format("{0: 0.000} s",frame_timer.tick_s); }
-		public override string StrDeltaMs(){ return string.Format("{0} ms",frame_timer.tick_ms); }
-		public override string StrFps(){ return string.Format("{0} fps",fps); }
-		public override string StrGlobal(){ return string.Format("{0: 0.000} s",global_time_s); }
 	}
 }

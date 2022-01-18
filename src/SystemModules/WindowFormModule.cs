@@ -4,49 +4,8 @@ using System.Drawing;
 
 namespace Module
 {
-	public sealed class FormModule : SystemModuleForWindow
+	public sealed class WindowForm : Module.WindowBase
 	{
-		public readonly Form Form;
-		
-		public FormModule(Desc desc)
-		{
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
-			Form = new FormWrap(desc);
-		}
-		
-		private void ChangeTitle()
-		{
-			Form.Text = string.Format("delta : {0} ({1}) / {2} / global : {3}",Hull.Time.StrDelta(),Hull.Time.StrDeltaMs(),Hull.Time.StrFps(),Hull.Time.StrGlobal());
-		}
-		
-		//	Module's
-		public override void OnCreate(LoopOrder loop_order)
-		{
-			loop_order.Add(ChangeTitle,1);
-			loop_order.Add(Application.DoEvents,5);
-		}
-		public override void OnBegin(){}
-		public override void OnEnd(){}
-		public override void OnDispose(){}
-		
-		//	Window's
-		public override int Width(){ return Form.ClientSize.Width; }
-		public override int Height(){ return Form.ClientSize.Height; }
-		
-		public override bool IsCreated(){ return Form.Created; }
-		
-		public override void Show()
-		{
-			Form.Show();
-		}
-		public override void Exit()
-		{
-			Application.Exit();
-		}
-		
-		
-		//	Resources
 		public struct Desc
 		{
 			public Point Location;
@@ -65,6 +24,47 @@ namespace Module
 			};
 		}
 		
+		//	Field ===============================================================================
+		public readonly Form Form;
+		
+		public WindowForm(Desc desc)
+		{
+			Application.EnableVisualStyles();
+			Application.SetCompatibleTextRenderingDefault(false);
+			Form = new FormWrap(desc);
+		}
+		
+		private void ChangeTitle()
+		{
+			Form.Text = string.Format("delta : {0}s ({1}ms) / {2}FPS / global : {3}s",Hull.Time.Delta(),Hull.Time.DeltaMs(),Hull.Time.Fps(),Hull.Time.Global());
+		}
+		
+		//	Base's ==============================================================================
+		public override void OnCreate(LoopOrder loop_order)
+		{
+			loop_order.Add(ChangeTitle,1);
+			loop_order.Add(Application.DoEvents,5);
+		}
+		public override void OnBegin(){}
+		public override void OnEnd(){}
+		public override void OnDispose(){}
+		
+		//	Window's ============================================================================
+		public override int Width(){ return Form.ClientSize.Width; }
+		public override int Height(){ return Form.ClientSize.Height; }
+		
+		public override bool IsCreated(){ return Form.Created; }
+		
+		public override void Show()
+		{
+			Form.Show();
+		}
+		public override void Exit()
+		{
+			Application.Exit();
+		}
+		
+		//	Wrapping! ===========================================================================
 		private class FormWrap : Form
 		{
 			public FormWrap(Desc desc)
