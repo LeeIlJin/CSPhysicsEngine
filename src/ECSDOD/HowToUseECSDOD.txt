@@ -1,7 +1,4 @@
-# CSPhysicsEngine
-
-
-- How to use my ECS DOD -
+How to use my ECS DOD
 
 1. Declare and Assign : ECS.Factory = new ECS.Factory();
 

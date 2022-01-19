@@ -1,17 +1,10 @@
 using System;
+using System.Collections.Generic;
 
 namespace Module
 {
-	public sealed class World : Module.Base
+	public sealed class WorldManager : Module.Base
 	{
-		private List<IWorld> worlds;
-		
-		
-		public World(params Resource.IWorld[] args)
-		{
-			
-		}
-		
 		public override void OnCreate(LoopOrder loop_order)
 		{
 			
