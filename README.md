@@ -3,16 +3,16 @@
   
 ### How to use my ECS DOD
 - Declare and Assign : `ECS.Factory = new ECS.Factory()`.
-- Call Method :` ECS.Factory.First_AddSystems(`Assignd system objects`)`.
-- *(Not Required)* Call Method : `ECS.Factory.Second_RegistComponentType<`Component type`>()`.
-- Declare and Assign : `ECS.Archetype = new ECS.Archetype(`Component types you want to give to the entity (typeof(_))`)`.
+- Call Method :` ECS.Factory.First_AddSystems(Assignd system objects)`.
+- *(Not Required)* Call Method : `ECS.Factory.Second_RegistComponentType<Component type>()`.
+- Declare and Assign : `ECS.Archetype = new ECS.Archetype(Component types you want to give to the entity (typeof(_)))`.
 	If you want shared one, use ECS.SharedArchetype.
-- *(Not Required But I Recommande)* Call Method : `ECS.Factory.SetComponentModel(`Component type` , `Assignd Component`)`.
-	or `SetComponentModels(`ECS.Archetype / ECS.SharedArchetype` , `Assignd Components`)`.
-- Call Method : `ECS.Factory.CreateEntity(`ECS.Archetype / ECS.SharedArchetype / Both all`)`.
+- *(Not Required But I Recommande)* Call Method : `ECS.Factory.SetComponentModel(Component type , Assignd Component)`.
+	or `SetComponentModels(ECS.Archetype / ECS.SharedArchetype , Assignd Components)`.
+- Call Method : `ECS.Factory.CreateEntity(ECS.Archetype / ECS.SharedArchetype / Both all)`.
 	This Method will return int[] , It means index about in component array *(Order is the same as the order of types when assigning an Archetype)*.
 	*(and If you use Both all for CreateEntity -> first ECS.Archetype , second ECS.SharedArchetype)*.
-- Declare and Assign : `ECS.Manager = new ECS.Manager(`ECS.Factory`)`.
+- Declare and Assign : `ECS.Manager = new ECS.Manager(ECS.Factory)`.
 - You can use the system's Run function, or you can use a custom function with Indices and Arrays.
 - Don't forget to dispose the factory.
 
