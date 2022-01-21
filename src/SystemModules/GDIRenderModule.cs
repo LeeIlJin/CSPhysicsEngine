@@ -24,21 +24,6 @@ namespace Module
 			windowGraphics.DrawImage(drawBackBuffer,Point.Empty);
 		}
 		
-		//	Test
-		private Resource.IPolygon poly;
-		private Resource.IColor col;
-		private Resource.IColor col2;
-		private float testangle;
-		private void Test()
-		{
-			this.RenderColorPolygon(poly,col,new Vector2(200,200),new Vector2(2.0f,2.0f),testangle);
-			testangle += 30.0f * Hull.Time.Delta();
-			if(testangle > 360.0f)
-				testangle = 0.0f;
-				
-			this.RenderColorPolygon(poly,col2,new Vector2(250,250),new Vector2(3.0f,3.0f),testangle);
-		}
-		
 		//	Base's ==============================================================================
 		public override void OnCreate(LoopOrder loop_order)
 		{
@@ -51,23 +36,16 @@ namespace Module
 			windowGraphics = fm.Form.CreateGraphics();
 			drawGraphics = Graphics.FromImage(drawBackBuffer);
 			
-			loop_order.Add(this.BeforeRender,70);	// 71 ~ 89 = Order For Render
-			loop_order.Add(this.AfterRender,90);
-			
-			loop_order.Add(this.Test,75);
+			loop_order.Add(this.BeforeRender,50);	// 71 ~ 89 = Order For Render
+			loop_order.Add(this.AfterRender,80);
 		}
 		public override void OnBegin()
 		{
-			poly = this.CreatePolygon(new Vector2(-30.0f,-30.0f),new Vector2(30.0f,-30.0f),new Vector2(30.0f,40.0f),new Vector2(-30.0f,30.0f));
-			col = this.CreateColor(255,255,0,0);
-			col2 = this.CreateColor(255,0,255,0);
-			testangle = 0.0f;
+			
 		}
 		public override void OnEnd()
 		{
-			poly.Dispose();
-			col.Dispose();
-			col2.Dispose();
+			
 		}
 		public override void OnDispose()
 		{
@@ -98,130 +76,126 @@ namespace Module
 			PolygonWrap pw = polygon as PolygonWrap;
 			if(pw == null)
 				return;
-			ColorWrap cw = color as ColorWrap;
-			if(cw == null)
+			ColorWrap c = color as ColorWrap;
+			if(c == null)
 				return;
 			
-			pw.RenderLocal(cw.brush);
-			pw.RenderWorld(drawGraphics,pos,scale);
+			pw.Scaling(scale);
+			pw.Translate(pos);
+			drawGraphics.FillPolygon(c.brush, pw.output);
 		}
 		public override void RenderColorPolygon(Resource.IPolygon polygon, Resource.IColor color, Vector2 pos, Vector2 scale, float angle)
 		{
 			PolygonWrap pw = polygon as PolygonWrap;
 			if(pw == null)
 				return;
-			ColorWrap cw = color as ColorWrap;
-			if(cw == null)
+			ColorWrap c = color as ColorWrap;
+			if(c == null)
 				return;
 			
-			pw.RenderLocal(cw.brush,angle);
-			pw.RenderWorld(drawGraphics,pos,scale);
+			pw.Scaling(scale);
+			pw.Rotate(angle);
+			pw.Translate(pos);
+			drawGraphics.FillPolygon(c.brush, pw.output);
 		}
 		public override void RenderColorCircle(Resource.ICircle circle, Resource.IColor color, Vector2 pos, Vector2 scale)
 		{
-			CircleWrap ciw = circle as CircleWrap;
-			if(ciw == null)
-				return;
-			ColorWrap cw = color as ColorWrap;
+			CircleWrap cw = circle as CircleWrap;
 			if(cw == null)
 				return;
+			ColorWrap c = color as ColorWrap;
+			if(c == null)
+				return;
 			
-			scale.MaxClamp();
-			ciw.RenderLocal(cw.brush);
-			ciw.RenderWorld(drawGraphics,pos,scale);
+			cw.Scaling(scale);
+			cw.Translate(pos);
+			drawGraphics.FillEllipse(c.brush, cw.x, cw.y, cw.width, cw.height);
 		}
 		
 		
 		
 		//	Wraps =====================================================================
-		private abstract class ShapeWrap
-		{
-			protected Graphics graphics;
-			protected Image image;
-			protected float half_size;
-			protected float size;
-			
-			public abstract void RenderLocal(Brush brush);
-			public virtual void RenderLocal(Brush brush, float angle){}
-			public void RenderWorld(Graphics g, Vector2 pos, Vector2 scale)
-			{
-				g.DrawImage(image,pos.x - half_size * scale.x, pos.y - half_size * scale.x, scale.x * size, scale.y * size);
-			}
-			
-			protected void ShapeWrapDispose()
-			{
-				graphics.Dispose();
-				image.Dispose();
-			}
-			
-			protected static Color zero_color = Color.FromArgb(0,0,0,0);
-		}
-		
 		// IPolygon ====================================
-		private class PolygonWrap : ShapeWrap, Resource.IPolygon
+		private class PolygonWrap : Resource.IPolygon
 		{
-			public PointF[] vertices;
+			public Vector2[] vertices;
+			public PointF[] output;
+			
 			internal PolygonWrap(Vector2[] args)
 			{
-				float max = float.MinValue;
-				foreach(Vector2 v in args)
-				{
-					float dis = v.length;
-					if(max < dis)
-					{
-						max = dis;
-					}
-				}
-				half_size = max;
-				size = max * 2.0f;
-				
-				vertices = new PointF[args.Length];
-				for(int i=0; i<vertices.Length; i++)
-				{
-					vertices[i] = new PointF(args[i].x + half_size,half_size - args[i].y);
-				}
-				
-				image = (Image)new Bitmap((int)size, (int)size);
-				graphics = Graphics.FromImage(image);
-				graphics.SmoothingMode = SmoothingMode.AntiAlias;
+				vertices = args;
+				output = new PointF[vertices.Length];
+				for(int i=0; i<output.Length; i++)
+					output[i] = new PointF(0.0f,0.0f);
 			}
-			public override void RenderLocal(Brush brush)
+			
+			public void Scaling(Vector2 scale)
 			{
-				graphics.Clear(zero_color);
-				graphics.FillPolygon(brush,vertices);
+				for(int i=0; i<output.Length; i++)
+				{
+					output[i].X = vertices[i].x * scale.x;
+					output[i].Y = vertices[i].y * scale.y;
+				}
 			}
-			public override void RenderLocal(Brush brush, float angle)
+			
+			public void Rotate(float angle)
 			{
-				Matrix transform = new Matrix();
-    			transform.RotateAt(angle, new PointF(half_size,half_size));
-				graphics.Transform = transform;
-				graphics.Clear(zero_color);
-				graphics.FillPolygon(brush,vertices);
+				float rad = angle * UMath.D2R;
+				for(int i=0; i<output.Length; i++)
+				{
+					PointF temp = output[i];
+					output[i].X = temp.X * (float)Math.Cos(rad) - temp.Y * (float)Math.Sin(rad);
+					output[i].Y = temp.X * (float)Math.Sin(rad) + temp.Y * (float)Math.Cos(rad);
+				}
 			}
+			
+			public void Translate(Vector2 position)
+			{
+				for(int i=0; i<output.Length; i++)
+				{
+					output[i].X += position.x;
+					output[i].Y += position.y;
+				}
+			}
+			
 			public int VertexCount(){ return vertices.Length; }
-			public Vector2 Vertex(int i){ return new Vector2(vertices[i].X,vertices[i].Y); }
-			public void Dispose(){ ShapeWrapDispose(); vertices = null; }
+			public Vector2 Vertex(int i){ return vertices[i]; }
+			public void Dispose(){ vertices = null; output = null; }
 		}
 		
 		//	ICircle =====================================
-		private class CircleWrap : ShapeWrap, Resource.ICircle
+		private class CircleWrap : Resource.ICircle
 		{
-			internal CircleWrap(float radius)
+			public float radius;
+			
+			public float x, y;
+			public float width, height;
+			
+			internal CircleWrap(float r)
 			{
-				half_size = radius;
-				size = radius * 2.0f;
+				this.radius = r;
 				
-				image = (Image)new Bitmap((int)size, (int)size);
-				graphics = Graphics.FromImage(image);
-				graphics.SmoothingMode = SmoothingMode.AntiAlias;
+				width = radius;
+				height = radius;
+				x = 0.0f;
+				y = 0.0f;
+				
 			}
-			public override void RenderLocal(Brush brush)
+			
+			public void Scaling(Vector2 scale)
 			{
-				graphics.Clear(zero_color);
-				graphics.FillEllipse(brush,0.0f,0.0f,size,size);
+				width = radius * scale.x;
+				height = radius * scale.y;
 			}
-			public float Radius(){ return half_size; }
-			public void Dispose(){ ShapeWrapDispose(); }
+			
+			public void Translate(Vector2 position)
+			{
+				x = position.x;
+				y = position.y;
+			}
+			
+			public float Radius(){ return radius; }
+			public void Dispose(){ }
 		}
 		
 		//	IColor ======================================

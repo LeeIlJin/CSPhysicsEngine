@@ -43,7 +43,7 @@ namespace Module
 		public override void OnCreate(LoopOrder loop_order)
 		{
 			loop_order.Add(ChangeTitle,1);
-			loop_order.Add(Application.DoEvents,5);
+			loop_order.Add(Application.DoEvents,20);
 		}
 		public override void OnBegin(){}
 		public override void OnEnd(){}

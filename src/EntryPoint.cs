@@ -11,7 +11,11 @@ internal class EntryPoint
 		(
 			new Module.WindowForm( Module.WindowForm.Desc.Default ),
 			new Module.TickTime( 1000 ),
-			new Module.GDIRender()
+			new Module.GDIRender(),
+			new Module.WorldManager
+			(
+				new Game.TestWorld()
+			)
 		);
 		hull.Run();
 		

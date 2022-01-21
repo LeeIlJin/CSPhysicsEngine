@@ -52,6 +52,20 @@ public class SystemHull
 	public readonly List<Module.Base> Modules;
 	
 	public event VoidMethod Loop;
+	/*
+	0 = Time.Begin
+	5 => Do Frame Begin
+	15 => Do Update Before Input
+	20 (temporary) = Window.Application.DoEvents
+	30 => Do Input Update
+	40 => Do Update After Input
+	50 = Render.BeforeRender
+	65 => Do Render
+	80 = Render.AfterRender
+	85 => Do Update After Render
+	90 => Do Frame End
+	99 = Time.End
+	*/
 	
 	public SystemHull
 	(
