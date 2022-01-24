@@ -231,22 +231,22 @@ namespace ECS
 			}
 		}
 		
-		public int[] CreateEntity(Archetype at)
+		public Entity CreateEntity(Archetype at)
 		{
 			return CreateComponentData_AddToSys(at, null);
 		}
 		
-		public int[] CreateEntity(SharedArchetype sat)
+		public Entity CreateEntity(SharedArchetype sat)
 		{
 			return CreateComponentData_AddToSys(null, sat);
 		}
 		
-		public int[] CreateEntity(Archetype at, SharedArchetype sat)
+		public Entity CreateEntity(Archetype at, SharedArchetype sat)
 		{
 			return CreateComponentData_AddToSys(at, sat);
 		}
 		
-		private int[] CreateComponentData_AddToSys(Archetype at, SharedArchetype sat)
+		private Entity CreateComponentData_AddToSys(Archetype at, SharedArchetype sat)
 		{
 			int totalCount = 0;
 			if(at != null)
@@ -386,7 +386,10 @@ namespace ECS
 					eSources[counter].Add(i,totalIndex[gotIndex[i]]);
 				counter++;
 			}
-			return totalIndex;
+			
+			Entity result = new Entity(totalIndex,totalTypes);
+			
+			return result;
 		}
 	}
 }

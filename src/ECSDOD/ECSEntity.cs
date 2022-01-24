@@ -3,6 +3,35 @@ using System.Collections.Generic;
 
 namespace ECS
 {
+	public class Entity
+	{
+		private int[] component_indices;
+		private IDictionary<Type,int> component_type_tracker;
+		
+		public T GetComponent<T>(ECS.Manager manager) where T : struct, ECS.IComponentData
+		{
+			return manager.CDAGroup.GetArray<T>().datas[component_indices[component_type_tracker[typeof(T)]]];
+		}
+		public void SetComponent<T>(ECS.Manager manager, T t) where T : struct, ECS.IComponentData
+		{
+			manager.CDAGroup.GetArray<T>().datas[component_indices[component_type_tracker[typeof(T)]]] = t;
+		}
+		
+		public Entity(int[] indices, Type[] types)
+		{
+			component_type_tracker = new Dictionary<Type,int>();
+			
+			component_indices = indices;
+			
+			int index = 0;
+			foreach(Type type in types)
+			{
+				component_type_tracker.Add(type,index++);
+			}
+		}
+	}
+	
+	
 	public struct IndicesOfType
 	{
 		public int[] Indices;
