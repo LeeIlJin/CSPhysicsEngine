@@ -61,7 +61,7 @@ namespace Module
 		{
 			return new PolygonWrap(args);
 		}
-		public override Resource.ICircle CraeteCircle(float radius)
+		public override Resource.ICircle CreateCircle(float radius)
 		{
 			return new CircleWrap(radius);
 		}
