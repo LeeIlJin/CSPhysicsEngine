@@ -123,7 +123,7 @@ namespace Module
 			
 			internal PolygonWrap(Vector2[] args)
 			{
-				vertices = args;
+				vertices = (Vector2[])args.Clone();
 				output = new PointF[vertices.Length];
 				for(int i=0; i<output.Length; i++)
 					output[i] = new PointF(0.0f,0.0f);
@@ -160,6 +160,7 @@ namespace Module
 			
 			public int VertexCount(){ return vertices.Length; }
 			public Vector2 Vertex(int i){ return vertices[i]; }
+			public Resource.IPolygon Copy(){ return new PolygonWrap(this.vertices); }
 			public void Dispose(){ vertices = null; output = null; }
 		}
 		
@@ -195,6 +196,7 @@ namespace Module
 			}
 			
 			public float Radius(){ return radius; }
+			public Resource.ICircle Copy(){ return new CircleWrap(this.radius); }
 			public void Dispose(){ }
 		}
 		
@@ -215,6 +217,7 @@ namespace Module
 			public void SetG(byte v){ brush.Color = Color.FromArgb(A(),R(),v,B()); }
 			public void SetB(byte v){ brush.Color = Color.FromArgb(A(),R(),G(),v); }
 			public void SetARGB(byte a, byte r, byte g, byte b){ brush.Color = Color.FromArgb(a,r,g,b); }
+			public Resource.IColor Copy(){ return new ColorWrap(brush.Color.A,brush.Color.R,brush.Color.G,brush.Color.B); }
 			public void Dispose(){ brush.Dispose(); }
 		}
 	}

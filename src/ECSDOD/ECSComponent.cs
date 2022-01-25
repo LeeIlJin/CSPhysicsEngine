@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ECS
 {
-	public interface IComponentData { void DeepCopy(); }
+	public interface IComponentData { void DeepCopy(); void SetFriend(int index); }
 	
 	public class ComponentDataArrayGroup : IDispose
 	{
@@ -69,6 +69,7 @@ namespace ECS
 			if(data == null)
 				data = new T();
 			data.DeepCopy();
+			data.SetFriend(list.Count);
 			list.Add((T)data);
 			return list.Count - 1;
 		}

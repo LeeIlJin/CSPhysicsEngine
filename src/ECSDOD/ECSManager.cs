@@ -199,7 +199,7 @@ namespace ECS
 				cdaSources.Add(typeof(T), new ComponentDataArraySource<T>());
 		}
 		
-		public void SetComponentFriends(Type own,params Type[] friends)
+		public void SetComponentFriends(Type own, params Type[] friends)
 		{
 			if(togetherComponents.ContainsKey(own))
 				togetherComponents[own] = friends;

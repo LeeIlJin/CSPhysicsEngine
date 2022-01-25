@@ -37,6 +37,20 @@ public static class UMath
 		return v;
 	}
 	
+	public static float Max(float a, float b)
+	{
+		if(a > b)
+			return a;
+		return b;
+	}
+	
+	public static float Min(float a, float b)
+	{
+		if(a < b)
+			return a;
+		return b;
+	}
+	
 	public static float Lerp(float p1, float p2, float r)
 	{
 		r = UMath.Clamp01(r);

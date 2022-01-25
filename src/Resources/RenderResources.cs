@@ -2,18 +2,7 @@ using System;
 
 namespace Resource
 {
-	public interface IPolygon : IDispose
-	{
-		int VertexCount();
-		Vector2 Vertex(int i);
-	}
-	
-	public interface ICircle : IDispose
-	{
-		float Radius();
-	}
-	
-	public interface IColor : IDispose
+	public interface IColor : IDeepCopy<Resource.IColor>, IDispose
 	{
 		byte A();
 		byte R();
