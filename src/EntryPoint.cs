@@ -7,6 +7,8 @@ internal class EntryPoint
 	[STAThread]
 	private static void Main()
 	{
+		URandom.CreateSeed();
+		
 		SystemHull hull = new SystemHull
 		(
 			new Module.WindowForm( Module.WindowForm.Desc.Default ),

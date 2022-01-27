@@ -20,9 +20,10 @@ namespace Game
 				Vector2 pos, sca;
 				pos = camera.WorldToRenderPosition(transform.position);
 				sca = camera.WorldToRenderScale(transform.scale);
-				
-				Console.WriteLine("System - Render : Pos({0}) , Sca({1})",pos.ToString(),sca.ToString());
-				
+				transform.angle += 1.75f;
+				if(transform.angle >= 360.0f)
+					transform.angle = 0.0f;
+					
 				renderer.RenderColorPolygon(resource.polygon, resource.color, pos, sca, transform.angle);
 			});
 		}

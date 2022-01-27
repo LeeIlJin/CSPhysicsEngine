@@ -27,13 +27,24 @@ namespace Game
 			factory.First_AddSystems(render_colorPolygonSystem);
 			
 			ECS.Archetype at = new ECS.Archetype(typeof(Game.Transform),typeof(Game.ColorPolygon));
-			factory.SetComponentModels
-			(
-				at,
-				Game.Transform.Set(new Vector2(0.5f,0.0f),Vector2.One,0.0f),
-				Game.ColorPolygon.Default(Render)
-			);
-			factory.CreateEntity(at);
+			
+			
+			for(int i=0; i<2500; i++)
+			{
+				Byte[] col = URandom.Bytes(3);
+				
+				Vector2 position = URandom.Vector2(-3.0f,3.0f);
+				Vector2 scale = new Vector2(1.0f,1.0f);
+				float angle = URandom.Float(360.0f);
+				
+				factory.SetComponentModels
+				(
+					at,
+					Game.Transform.Set(position,scale,angle),
+					Game.ColorPolygon.Default(Render).Color(255,col[0],col[1],col[2])
+				);
+				factory.CreateEntity(at);
+			}
 			
 			ecs_manager = new ECS.Manager(factory);
 			factory.Dispose();
@@ -68,7 +79,6 @@ namespace Game
 		public override void OnUpdateBeforeRender(){ camera.UpdateCamera(); }
 		public override void OnRender()
 		{
-			Console.WriteLine("Render");
 			render_colorPolygonSystem.Run();
 			
 			Render.RenderColorPolygon(center,center_color,new Vector2(Window.Width() * 0.5f, Window.Height() * 0.5f),new Vector2(3.0f,3.0f));
