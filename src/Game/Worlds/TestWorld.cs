@@ -4,45 +4,60 @@ namespace Game
 {
 	public class TestWorld : Module.WorldNode
 	{
-		private Resource.IPolygon poly;
-		private Resource.IColor col;
-		private Resource.IColor col2;
-		private float testangle;
-		private void Test()
-		{
-			Render.RenderColorPolygon(poly,col,new Vector2(200,200),new Vector2(2.0f,2.0f),testangle);
-			testangle += 30.0f * Time.Delta();
-			if(testangle > 360.0f)
-				testangle = 0.0f;
-				
-			Render.RenderColorPolygon(poly,col2,new Vector2(250,250),new Vector2(3.0f,3.0f),testangle);
-			
-			Vector2 pos;
-			for(int i=0; i<50; i++)
-			{
-				pos = new Vector2(250 + i * 20, 250 + i * 10);
-				Render.RenderColorPolygon(poly,col2,pos,new Vector2(0.5f,0.5f),testangle + i);
-			}
-		}
+		private ECS.Manager ecs_manager;
+		private WorldCamera camera;
+		
+		private RenderColorPolygonSystem render_colorPolygonSystem;
+		
+		
+		private Resource.IPolygon center;
+		private Resource.IColor center_color;
 		
 		public override void OnEnable(){}
 		public override void OnDisable(){}
 		
-		public override void OnCreate(){}
+		public override void OnCreate()
+		{
+			camera = new WorldCamera(Vector2.Zero, 10.0f, Window.Width(), Window.Height());
+			render_colorPolygonSystem = new RenderColorPolygonSystem(Render, camera);
+		}
 		public override void OnBegin()
 		{
-			poly = Render.CreatePolygon(new Vector2(-30.0f,-30.0f),new Vector2(30.0f,-30.0f),new Vector2(30.0f,40.0f),new Vector2(-30.0f,30.0f));
-			col = Render.CreateColor(255,255,0,0);
-			col2 = Render.CreateColor(255,0,255,0);
-			testangle = 0.0f;
+			ECS.Factory factory = new ECS.Factory();
+			factory.First_AddSystems(render_colorPolygonSystem);
+			
+			ECS.Archetype at = new ECS.Archetype(typeof(Game.Transform),typeof(Game.ColorPolygon));
+			factory.SetComponentModels
+			(
+				at,
+				Game.Transform.Set(new Vector2(0.5f,0.0f),Vector2.One,0.0f),
+				Game.ColorPolygon.Default(Render)
+			);
+			factory.CreateEntity(at);
+			
+			ecs_manager = new ECS.Manager(factory);
+			factory.Dispose();
+			
+			center = Render.CreatePolygon
+			(
+				new Vector2(-1.0f,-1.0f),
+				new Vector2(-1.0f,1.0f),
+				new Vector2(1.0f,1.0f),
+				new Vector2(1.0f,-1.0f)
+			);
+			
+			center_color = Render.CreateColor(255,255,0,0);
 		}
 		public override void OnEnd()
 		{
-			poly.Dispose();
-			col.Dispose();
-			col2.Dispose();
+			
 		}
-		public override void OnDispose(){}
+		public override void OnDispose()
+		{
+			ecs_manager.Dispose();
+			center.Dispose();
+			center_color.Dispose();
+		}
 		
 		
 		//	Loop Events
@@ -50,8 +65,14 @@ namespace Game
 		
 		public override void OnUpdateBeforeInput(){}
 		public override void OnUpdateAfterInput(){}
-		
-		public override void OnRender(){ Test(); }
+		public override void OnUpdateBeforeRender(){ camera.UpdateCamera(); }
+		public override void OnRender()
+		{
+			Console.WriteLine("Render");
+			render_colorPolygonSystem.Run();
+			
+			Render.RenderColorPolygon(center,center_color,new Vector2(Window.Width() * 0.5f, Window.Height() * 0.5f),new Vector2(3.0f,3.0f));
+		}
 		public override void OnUpdateAfterRender(){}
 		
 		public override void OnFrameEnd(){}

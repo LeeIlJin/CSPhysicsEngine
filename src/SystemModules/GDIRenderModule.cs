@@ -134,7 +134,7 @@ namespace Module
 				for(int i=0; i<output.Length; i++)
 				{
 					output[i].X = vertices[i].x * scale.x;
-					output[i].Y = vertices[i].y * scale.y;
+					output[i].Y = -vertices[i].y * scale.y;
 				}
 			}
 			

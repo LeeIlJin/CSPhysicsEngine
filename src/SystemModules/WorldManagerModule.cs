@@ -56,6 +56,7 @@ namespace Module
 		private void FrameBegin(){ if(next_world >= 0){ SwitchWorld(next_world); } current_world.OnFrameBegin(); }
 		private void UpdateBeforeInput(){ current_world.OnUpdateBeforeInput(); }
 		private void UpdateAfterInput(){ current_world.OnUpdateAfterInput(); }
+		private void UpdateBeforeRender(){ current_world.OnUpdateBeforeRender(); }
 		private void Render(){ current_world.OnRender(); }
 		private void UpdateAfterRender(){ current_world.OnUpdateAfterRender(); }
 		private void FrameEnd(){ current_world.OnFrameEnd(); }
@@ -77,6 +78,7 @@ namespace Module
 			loop_order.Add(this.FrameBegin,5);
 			loop_order.Add(this.UpdateBeforeInput,15);
 			loop_order.Add(this.UpdateAfterInput,40);
+			loop_order.Add(this.UpdateBeforeRender,45);
 			loop_order.Add(this.Render,65);
 			loop_order.Add(this.UpdateAfterRender,85);
 			loop_order.Add(this.FrameEnd,90);
@@ -130,6 +132,7 @@ namespace Module
 		public virtual void OnUpdateBeforeInput(){}
 		public virtual void OnUpdateAfterInput(){}
 		
+		public virtual void OnUpdateBeforeRender(){}
 		public virtual void OnRender(){}
 		public virtual void OnUpdateAfterRender(){}
 		

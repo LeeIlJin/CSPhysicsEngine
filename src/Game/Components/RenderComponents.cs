@@ -11,9 +11,23 @@ namespace Game
 		
 		public static ColorPolygon Set(Module.RenderBase renderModule, params Vector2[] args)
 		{
-			return new ColorPolygon()
+			return new ColorPolygon
 			{
 				polygon = renderModule.CreatePolygon(args),
+				color = renderModule.CreateColor(255,0,255,0)
+			};
+		}
+		
+		public static ColorPolygon Default(Module.RenderBase renderModule)
+		{
+			Vector2[] vertices = new Vector2[3];
+			vertices[0] = new Vector2(-0.5f, -0.5f);
+			vertices[1] = new Vector2(-0.5f, 0.5f);
+			vertices[2] = new Vector2(0.5f, -0.5f);
+			
+			return new ColorPolygon
+			{
+				polygon = renderModule.CreatePolygon(vertices),
 				color = renderModule.CreateColor(255,0,255,0)
 			};
 		}
@@ -31,7 +45,7 @@ namespace Game
 		
 		public static ColorCircle Set(Module.RenderBase renderModule, float radius)
 		{
-			return new ColorCircle()
+			return new ColorCircle
 			{
 				circle = renderModule.CreateCircle(radius),
 				color = renderModule.CreateColor(255,0,255,0)
