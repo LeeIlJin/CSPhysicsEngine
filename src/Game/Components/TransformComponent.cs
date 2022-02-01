@@ -1,6 +1,6 @@
 using System;
 
-namespace Game
+namespace Game.Component
 {
 	public struct Transform : ECS.IComponentData
 	{
@@ -10,7 +10,9 @@ namespace Game
 		
 		public float size{ get{ return UMath.Max(scale.x,scale.y); } }
 		
-		public static Transform Set(Vector2 _position, Vector2 _scale, float _angle)
+		public void Angle(float _angle){ angle = UMath.Repeat(_angle,0.0f,360.0f); }
+		
+		public static Transform Create(Vector2 _position, Vector2 _scale, float _angle)
 		{
 			return new Transform
 			{
@@ -22,12 +24,7 @@ namespace Game
 		
 		public static Transform Default()
 		{
-			return new Transform
-			{
-				 position = Vector2.Zero,
-				 scale = Vector2.One,
-				 angle = 0.0f
-			};
+			return Create(Vector2.Zero, Vector2.One, 0.0f);
 		}
 		
 		public void DeepCopy(){}

@@ -7,7 +7,7 @@ namespace Game
 		private ECS.Manager ecs_manager;
 		private WorldCamera camera;
 		
-		private RenderColorPolygonSystem render_colorPolygonSystem;
+		private System.ColorPolygon system_colorPolygon;
 		
 		
 		private Resource.IPolygon center;
@@ -19,14 +19,15 @@ namespace Game
 		public override void OnCreate()
 		{
 			camera = new WorldCamera(Vector2.Zero, 10.0f, Window.Width(), Window.Height());
-			render_colorPolygonSystem = new RenderColorPolygonSystem(Render, camera);
+			system_colorPolygon = new System.ColorPolygon(Render, camera);
 		}
 		public override void OnBegin()
 		{
 			ECS.Factory factory = new ECS.Factory();
-			factory.First_AddSystems(render_colorPolygonSystem);
+			factory.First_AddSystems(system_colorPolygon);
 			
-			ECS.Archetype at = new ECS.Archetype(typeof(Game.Transform),typeof(Game.ColorPolygon));
+			
+			ECS.Archetype at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon));
 			
 			
 			for(int i=0; i<2500; i++)
@@ -40,8 +41,8 @@ namespace Game
 				factory.SetComponentModels
 				(
 					at,
-					Game.Transform.Set(position,scale,angle),
-					Game.ColorPolygon.Default(Render).Color(255,col[0],col[1],col[2])
+					Component.Transform.Create(position,scale,angle),
+					Component.ColorPolygon.Default(Render).Color(255,col[0],col[1],col[2])
 				);
 				factory.CreateEntity(at);
 			}
@@ -79,7 +80,7 @@ namespace Game
 		public override void OnUpdateBeforeRender(){ camera.UpdateCamera(); }
 		public override void OnRender()
 		{
-			render_colorPolygonSystem.Run();
+			system_colorPolygon.Run();
 			
 			Render.RenderColorPolygon(center,center_color,new Vector2(Window.Width() * 0.5f, Window.Height() * 0.5f),new Vector2(3.0f,3.0f));
 		}

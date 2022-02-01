@@ -8,6 +8,10 @@ namespace ECS
 		private int[] component_indices;
 		private IDictionary<Type,int> component_type_tracker;
 		
+		public int GetComponentIndex<T>() where T : struct, ECS.IComponentData
+		{
+			return component_indices[component_type_tracker[typeof(T)]];
+		}
 		public T GetComponent<T>(ECS.Manager manager) where T : struct, ECS.IComponentData
 		{
 			return manager.CDAGroup.GetArray<T>().datas[component_indices[component_type_tracker[typeof(T)]]];

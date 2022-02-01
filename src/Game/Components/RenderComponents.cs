@@ -1,6 +1,6 @@
 using System;
 
-namespace Game
+namespace Game.Component
 {
 	public struct ColorPolygon : ECS.IComponentData
 	{
@@ -9,12 +9,12 @@ namespace Game
 		
 		public ColorPolygon Color(byte a, byte r, byte g, byte b){ color.SetARGB(a,r,g,b); return this; }
 		
-		public static ColorPolygon Set(Module.RenderBase renderModule, params Vector2[] args)
+		public static ColorPolygon Create(Module.RenderBase renderModule, byte a, byte r, byte g, byte b, params Vector2[] args)
 		{
 			return new ColorPolygon
 			{
 				polygon = renderModule.CreatePolygon(args),
-				color = renderModule.CreateColor(255,0,255,0)
+				color = renderModule.CreateColor(a,r,g,b)
 			};
 		}
 		
@@ -25,11 +25,7 @@ namespace Game
 			vertices[1] = new Vector2(-0.5f, 0.5f);
 			vertices[2] = new Vector2(0.5f, -0.5f);
 			
-			return new ColorPolygon
-			{
-				polygon = renderModule.CreatePolygon(vertices),
-				color = renderModule.CreateColor(255,0,255,0)
-			};
+			return Create(renderModule, 255, 48, 101, 172, vertices);
 		}
 		
 		public void DeepCopy(){ polygon = polygon.Copy(); color = color.Copy(); }
@@ -43,13 +39,18 @@ namespace Game
 		
 		public ColorCircle Color(byte a, byte r, byte g, byte b){ color.SetARGB(a,r,g,b); return this; }
 		
-		public static ColorCircle Set(Module.RenderBase renderModule, float radius)
+		public static ColorCircle Create(Module.RenderBase renderModule, byte a, byte r, byte g, byte b, float radius)
 		{
 			return new ColorCircle
 			{
 				circle = renderModule.CreateCircle(radius),
-				color = renderModule.CreateColor(255,0,255,0)
+				color = renderModule.CreateColor(a,r,g,b)
 			};
+		}
+		
+		public static ColorCircle Default(Module.RenderBase renderModule)
+		{
+			return Create(renderModule, 255, 48, 101, 172, 0.5f);
 		}
 		
 		public void DeepCopy(){ circle = circle.Copy(); color = color.Copy(); }

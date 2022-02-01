@@ -33,4 +33,28 @@ public static class URandom
 		random.NextBytes(bs);
 		return bs;
 	}
+	
+	public static byte[] Bytes(uint length, byte max)
+	{
+		byte[] bs = new byte[length];
+		random.NextBytes(bs);
+		for(int i=0; i<length; i++)
+		{
+			bs[i] %= max;
+		}
+		return bs;
+	}
+	
+	public static byte[] Bytes(uint length, byte min, byte max)
+	{
+		byte[] bs = new byte[length];
+		random.NextBytes(bs);
+		byte sub = (byte)(max - (int)min);
+		for(int i=0; i<length; i++)
+		{
+			bs[i] %= sub;
+			bs[i] += min;
+		}
+		return bs;
+	}
 }

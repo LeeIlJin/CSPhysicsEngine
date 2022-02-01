@@ -51,6 +51,11 @@ public static class UMath
 		return b;
 	}
 	
+	public static float Repeat(float v, float min, float max)
+	{
+		return min + ((v - min) % (max - min));
+	}
+	
 	public static float Lerp(float p1, float p2, float r)
 	{
 		r = UMath.Clamp01(r);

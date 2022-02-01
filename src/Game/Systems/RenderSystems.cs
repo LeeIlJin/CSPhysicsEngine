@@ -1,13 +1,13 @@
 using System;
 
-namespace Game
+namespace Game.System
 {
-	public sealed class RenderColorPolygonSystem : ECS.SystemBase<Game.Transform, Game.ColorPolygon>
+	public sealed class ColorPolygon : ECS.SystemBase<Component.Transform, Component.ColorPolygon>
 	{
 		private readonly Module.RenderBase renderer;
 		private WorldCamera camera;
 		
-		public RenderColorPolygonSystem(Module.RenderBase _renderer, WorldCamera _camera)
+		public ColorPolygon(Module.RenderBase _renderer, WorldCamera _camera)
 		{
 			this.renderer = _renderer;
 			this.camera = _camera;
@@ -15,7 +15,7 @@ namespace Game
 		
 		public override void OnCreate()
 		{
-			ForEach((ref Game.Transform transform, ref Game.ColorPolygon resource) =>
+			ForEach((ref Component.Transform transform, ref Component.ColorPolygon resource) =>
 			{
 				Vector2 pos, sca;
 				pos = camera.WorldToRenderPosition(transform.position);
