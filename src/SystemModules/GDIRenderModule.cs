@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Collections.Generic;
 
 namespace Module
 {
@@ -14,15 +15,38 @@ namespace Module
 		private Image drawBackBuffer;
 		private Color drawBackColor;
 		
+		private List<ColorPolygonWrap> polygons;
+		private List<ColorCircleWrap> circles;
+		
 		private void BeforeRender()
 		{
 			drawGraphics.Clear(drawBackColor);
+		}
+		
+		private void ListRender()
+		{
+			for(int i=0; i<polygons.Count; i++)
+			{
+				if(!polygons[i].visible)
+					continue;
+				polygons[i].CalcOutput();
+				drawGraphics.FillPolygon(polygons[i].brush, polygons[i].output);
+			}
+			
+			for(int i=0; i<circles.Count; i++)
+			{
+				if(!circles[i].visible)
+					continue;
+				circles[i].CalcOutput();
+				drawGraphics.FillEllipse(circles[i].brush, circles[i].position.x, circles[i].position.y, circles[i].scale.x, circles[i].scale.y);
+			}
 		}
 		
 		private void AfterRender()
 		{
 			windowGraphics.DrawImage(drawBackBuffer,Point.Empty);
 		}
+		
 		
 		//	Base's ==============================================================================
 		public override void OnCreate(LoopOrder loop_order)
@@ -36,7 +60,11 @@ namespace Module
 			windowGraphics = fm.Form.CreateGraphics();
 			drawGraphics = Graphics.FromImage(drawBackBuffer);
 			
-			loop_order.Add(this.BeforeRender,50);	// 71 ~ 89 = Order For Render
+			polygons = new List<ColorPolygonWrap>();
+			circles = new List<ColorCircleWrap>();
+			
+			loop_order.Add(this.BeforeRender,50);	// 51 ~ 79 = Order For Render
+			loop_order.Add(this.ListRender,79);
 			loop_order.Add(this.AfterRender,80);
 		}
 		public override void OnBegin()
@@ -49,6 +77,18 @@ namespace Module
 		}
 		public override void OnDispose()
 		{
+			for(int i=0; i<polygons.Count; i++)
+			{
+				polygons[i].Dispose();
+			}
+			for(int i=0; i<circles.Count; i++)
+			{
+				circles[i].Dispose();
+			}
+			
+			polygons.Clear();
+			circles.Clear();
+			
 			windowGraphics.Dispose();
 			drawGraphics.Dispose();
 			drawBackBuffer.Dispose();
@@ -57,157 +97,110 @@ namespace Module
 		//	Render's ============================================================================
 		
 		//	Create Resource ===========================================================
-		public override Resource.IPolygon CreatePolygon(params Vector2[] args)
+		public override Resource.IColorPolygon CreateColorPolygon(byte a, byte r, byte g, byte b, params Vector2[] args)
 		{
-			return new PolygonWrap(args);
+			ColorPolygonWrap newone = new ColorPolygonWrap(args,a,r,g,b);
+			newone.owner = this;
+			polygons.Add(newone);
+			return newone;
 		}
-		public override Resource.ICircle CreateCircle(float radius)
+		public override Resource.IColorCircle CreateColorCircle(byte a, byte r, byte g, byte b, float radius)
 		{
-			return new CircleWrap(radius);
+			ColorCircleWrap newone = new ColorCircleWrap(radius,a,r,g,b);
+			newone.owner = this;
+			circles.Add(newone);
+			return newone;
 		}
-		public override Resource.IColor CreateColor(byte a, byte r, byte g, byte b)
-		{
-			return new ColorWrap(a,r,g,b);
-		}
-		
-		//	Render Method =============================================================
-		public override void RenderColorPolygon(Resource.IPolygon polygon, Resource.IColor color, Vector2 pos, Vector2 scale)
-		{
-			PolygonWrap pw = polygon as PolygonWrap;
-			if(pw == null)
-				return;
-			ColorWrap c = color as ColorWrap;
-			if(c == null)
-				return;
-			
-			pw.Scaling(scale);
-			pw.Translate(pos);
-			drawGraphics.FillPolygon(c.brush, pw.output);
-		}
-		public override void RenderColorPolygon(Resource.IPolygon polygon, Resource.IColor color, Vector2 pos, Vector2 scale, float angle)
-		{
-			PolygonWrap pw = polygon as PolygonWrap;
-			if(pw == null)
-				return;
-			ColorWrap c = color as ColorWrap;
-			if(c == null)
-				return;
-			
-			pw.Scaling(scale);
-			pw.Rotate(angle);
-			pw.Translate(pos);
-			drawGraphics.FillPolygon(c.brush, pw.output);
-		}
-		public override void RenderColorCircle(Resource.ICircle circle, Resource.IColor color, Vector2 pos, Vector2 scale)
-		{
-			CircleWrap cw = circle as CircleWrap;
-			if(cw == null)
-				return;
-			ColorWrap c = color as ColorWrap;
-			if(c == null)
-				return;
-			
-			cw.Scaling(scale);
-			cw.Translate(pos);
-			drawGraphics.FillEllipse(c.brush, cw.x, cw.y, cw.width, cw.height);
-		}
-		
 		
 		
 		//	Wraps =====================================================================
-		// IPolygon ====================================
-		private class PolygonWrap : Resource.IPolygon
+		// IColorPolygon ====================================
+		private class ColorPolygonWrap : Resource.IColorPolygon
 		{
+			public GDIRender owner;
+			
+			public bool visible;
+			
+			public bool position_changed;
+			public Vector2 position;
+			public bool scale_changed;
+			public Vector2 scale;
+			public bool angle_changed;
+			public float angle;
+			
 			public Vector2[] vertices;
 			public PointF[] output;
 			
-			internal PolygonWrap(Vector2[] args)
+			public SolidBrush brush;
+			
+			internal ColorPolygonWrap(Vector2[] args, byte a, byte r, byte g, byte b)
 			{
+				visible = true;
+				
+				position_changed = false;
+				scale_changed = false;
+				angle_changed = false;
+				
+				position = Vector2.Zero;
+				scale = Vector2.One;
+				angle = 0.0f;
+				
 				vertices = (Vector2[])args.Clone();
 				output = new PointF[vertices.Length];
-				for(int i=0; i<output.Length; i++)
-					output[i] = new PointF(0.0f,0.0f);
-			}
-			
-			public void Scaling(Vector2 scale)
-			{
-				for(int i=0; i<output.Length; i++)
-				{
-					output[i].X = vertices[i].x * scale.x;
-					output[i].Y = -vertices[i].y * scale.y;
-				}
-			}
-			
-			public void Rotate(float angle)
-			{
-				float rad = angle * UMath.D2R;
-				for(int i=0; i<output.Length; i++)
-				{
-					PointF temp = output[i];
-					output[i].X = temp.X * (float)Math.Cos(rad) - temp.Y * (float)Math.Sin(rad);
-					output[i].Y = temp.X * (float)Math.Sin(rad) + temp.Y * (float)Math.Cos(rad);
-				}
-			}
-			
-			public void Translate(Vector2 position)
-			{
-				for(int i=0; i<output.Length; i++)
-				{
-					output[i].X += position.x;
-					output[i].Y += position.y;
-				}
-			}
-			
-			public int VertexCount(){ return vertices.Length; }
-			public Vector2 Vertex(int i){ return vertices[i]; }
-			public Resource.IPolygon Copy(){ return new PolygonWrap(this.vertices); }
-			public void Dispose(){ vertices = null; output = null; }
-		}
-		
-		//	ICircle =====================================
-		private class CircleWrap : Resource.ICircle
-		{
-			public float radius;
-			
-			public float x, y;
-			public float width, height;
-			
-			internal CircleWrap(float r)
-			{
-				this.radius = r;
 				
-				width = radius;
-				height = radius;
-				x = 0.0f;
-				y = 0.0f;
-				
-			}
-			
-			public void Scaling(Vector2 scale)
-			{
-				width = radius * scale.x;
-				height = radius * scale.y;
-			}
-			
-			public void Translate(Vector2 position)
-			{
-				x = position.x;
-				y = position.y;
-			}
-			
-			public float Radius(){ return radius; }
-			public Resource.ICircle Copy(){ return new CircleWrap(this.radius); }
-			public void Dispose(){ }
-		}
-		
-		//	IColor ======================================
-		private class ColorWrap : Resource.IColor
-		{
-			public SolidBrush brush;
-			internal ColorWrap(byte a, byte r, byte g, byte b)
-			{
 				brush = new SolidBrush(Color.FromArgb(a,r,g,b));
 			}
+			
+			public void CalcOutput()
+			{	
+				if(scale_changed)
+				{
+					for(int i=0; i<output.Length; i++)
+					{
+						output[i].X = vertices[i].x * scale.x;
+						output[i].Y = -vertices[i].y * scale.y;
+					}
+					scale_changed = false;
+				}
+				else
+				{
+					for(int i=0; i<output.Length; i++)
+					{
+						output[i].X = vertices[i].x;
+						output[i].Y = -vertices[i].y;
+					}
+				}
+				
+				if(angle_changed)
+				{
+					float rad = angle * UMath.D2R;
+					for(int i=0; i<output.Length; i++)
+					{
+						PointF temp = output[i];
+						output[i].X = temp.X * (float)Math.Cos(rad) - temp.Y * (float)Math.Sin(rad);
+						output[i].Y = temp.X * (float)Math.Sin(rad) + temp.Y * (float)Math.Cos(rad);
+					}
+					angle_changed = false;
+				}
+				
+				if(position_changed)
+				{
+					for(int i=0; i<output.Length; i++)
+					{
+						output[i].X += position.x;
+						output[i].Y += position.y;
+					}
+					position_changed = false;
+				}
+			}
+			
+			public void Visible(bool b){ visible = b; }
+			public bool IsVisible(){ return visible; }
+			
+			public void SetPositionThisFrame(Vector2 _position){ position_changed = true; position = _position; }
+			public void SetScaleThisFrame(Vector2 _scale){ scale_changed = true; scale = _scale; }
+			public void SetAngleThisFrame(float _angle){ angle_changed = true; angle = _angle; }
+			
 			public byte A(){ return brush.Color.A; }
 			public byte R(){ return brush.Color.R; }
 			public byte G(){ return brush.Color.G; }
@@ -217,7 +210,85 @@ namespace Module
 			public void SetG(byte v){ brush.Color = Color.FromArgb(A(),R(),v,B()); }
 			public void SetB(byte v){ brush.Color = Color.FromArgb(A(),R(),G(),v); }
 			public void SetARGB(byte a, byte r, byte g, byte b){ brush.Color = Color.FromArgb(a,r,g,b); }
-			public Resource.IColor Copy(){ return new ColorWrap(brush.Color.A,brush.Color.R,brush.Color.G,brush.Color.B); }
+			
+			public int VertexCount(){ return vertices.Length; }
+			public Vector2 Vertex(int i){ return vertices[i]; }
+			
+			public Resource.IColorShape Copy(){ return owner.CreateColorPolygon(brush.Color.A,brush.Color.R,brush.Color.G,brush.Color.B,this.vertices); }
+			public void Dispose(){ vertices = null; output = null; brush.Dispose(); }
+		}
+		
+		//	ICircle =====================================
+		private class ColorCircleWrap : Resource.IColorCircle
+		{
+			public GDIRender owner;
+			
+			public bool visible;
+			
+			public bool position_changed;
+			public Vector2 position;
+			public bool scale_changed;
+			public Vector2 scale;
+			
+			public float radius;
+			
+			public SolidBrush brush;
+			
+			internal ColorCircleWrap(float _radius, byte a, byte r, byte g, byte b)
+			{
+				visible = true;
+				
+				position_changed = false;
+				scale_changed = false;
+				
+				position = Vector2.Zero;
+				scale = Vector2.One;
+				
+				this.radius = _radius;
+				brush = new SolidBrush(Color.FromArgb(a,r,g,b));
+			}
+			
+			public void CalcOutput()
+			{
+				if(position_changed)
+				{
+					position_changed = false;
+				}
+				else
+				{
+					position = Vector2.Zero;
+				}
+				
+				if(scale_changed)
+				{
+					scale = scale * radius;
+					scale_changed = false;
+				}
+				else
+				{
+					scale = new Vector2(radius, radius);
+				}
+			}
+			
+			public void Visible(bool b){ visible = b; }
+			public bool IsVisible(){ return visible; }
+			
+			public void SetPositionThisFrame(Vector2 _position){ position_changed = true; position = _position; }
+			public void SetScaleThisFrame(Vector2 _scale){ scale_changed = true; scale = _scale; }
+			public void SetAngleThisFrame(float _angle){ return; }
+			
+			public byte A(){ return brush.Color.A; }
+			public byte R(){ return brush.Color.R; }
+			public byte G(){ return brush.Color.G; }
+			public byte B(){ return brush.Color.B; }
+			public void SetA(byte v){ brush.Color = Color.FromArgb(v,R(),G(),B()); }
+			public void SetR(byte v){ brush.Color = Color.FromArgb(A(),v,G(),B()); }
+			public void SetG(byte v){ brush.Color = Color.FromArgb(A(),R(),v,B()); }
+			public void SetB(byte v){ brush.Color = Color.FromArgb(A(),R(),G(),v); }
+			public void SetARGB(byte a, byte r, byte g, byte b){ brush.Color = Color.FromArgb(a,r,g,b); }
+			
+			public float Radius(){ return radius; }
+			public Resource.IColorShape Copy(){ return owner.CreateColorCircle(brush.Color.A,brush.Color.R,brush.Color.G,brush.Color.B,this.radius); }
 			public void Dispose(){ brush.Dispose(); }
 		}
 	}

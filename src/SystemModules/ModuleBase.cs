@@ -32,12 +32,7 @@ namespace Module
 	
 	public abstract class RenderBase : Module.Base
 	{
-		public abstract Resource.IPolygon CreatePolygon(params Vector2[] args);
-		public abstract Resource.ICircle CreateCircle(float radius);
-		public abstract Resource.IColor CreateColor(byte a, byte r, byte g, byte b);
-		
-		public abstract void RenderColorPolygon(Resource.IPolygon p, Resource.IColor color, Vector2 pos, Vector2 scale);
-		public abstract void RenderColorPolygon(Resource.IPolygon p, Resource.IColor color, Vector2 pos, Vector2 scale, float angle);
-		public abstract void RenderColorCircle(Resource.ICircle c, Resource.IColor color, Vector2 pos, Vector2 scale);
+		public abstract Resource.IColorPolygon CreateColorPolygon(byte a, byte r, byte g, byte b, params Vector2[] args);
+		public abstract Resource.IColorCircle CreateColorCircle(byte a, byte r, byte g, byte b, float radius);
 	}
 }

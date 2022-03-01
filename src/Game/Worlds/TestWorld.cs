@@ -7,11 +7,8 @@ namespace Game
 		private ECS.Manager ecs_manager;
 		private WorldCamera camera;
 		
-		private System.ColorPolygon system_colorPolygon;
+		private System.ColorShape system_colorShape;
 		
-		
-		private Resource.IPolygon center;
-		private Resource.IColor center_color;
 		
 		public override void OnEnable(){}
 		public override void OnDisable(){}
@@ -19,15 +16,15 @@ namespace Game
 		public override void OnCreate()
 		{
 			camera = new WorldCamera(Vector2.Zero, 10.0f, Window.Width(), Window.Height());
-			system_colorPolygon = new System.ColorPolygon(Render, camera);
+			system_colorShape = new System.ColorShape(camera);
 		}
 		public override void OnBegin()
 		{
 			ECS.Factory factory = new ECS.Factory();
-			factory.First_AddSystems(system_colorPolygon);
+			factory.First_AddSystems(system_colorShape);
 			
 			
-			ECS.Archetype at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon));
+			ECS.Archetype at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorShape));
 			
 			
 			for(int i=0; i<2500; i++)
@@ -42,7 +39,7 @@ namespace Game
 				(
 					at,
 					Component.Transform.Create(position,scale,angle),
-					Component.ColorPolygon.Default(Render).Color(255,col[0],col[1],col[2])
+					Component.ColorShape.DefaultPolygon(Render).Color(255,col[0],col[1],col[2])
 				);
 				factory.CreateEntity(at);
 			}
@@ -50,15 +47,15 @@ namespace Game
 			ecs_manager = new ECS.Manager(factory);
 			factory.Dispose();
 			
-			center = Render.CreatePolygon
+			Render.CreateColorPolygon
 			(
+				255,255,0,0,
 				new Vector2(-1.0f,-1.0f),
 				new Vector2(-1.0f,1.0f),
 				new Vector2(1.0f,1.0f),
 				new Vector2(1.0f,-1.0f)
 			);
 			
-			center_color = Render.CreateColor(255,255,0,0);
 		}
 		public override void OnEnd()
 		{
@@ -67,8 +64,6 @@ namespace Game
 		public override void OnDispose()
 		{
 			ecs_manager.Dispose();
-			center.Dispose();
-			center_color.Dispose();
 		}
 		
 		
@@ -80,9 +75,7 @@ namespace Game
 		public override void OnUpdateBeforeRender(){ camera.UpdateCamera(); }
 		public override void OnRender()
 		{
-			system_colorPolygon.Run();
-			
-			Render.RenderColorPolygon(center,center_color,new Vector2(Window.Width() * 0.5f, Window.Height() * 0.5f),new Vector2(3.0f,3.0f));
+			system_colorShape.Run();
 		}
 		public override void OnUpdateAfterRender(){}
 		
