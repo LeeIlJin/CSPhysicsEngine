@@ -20,7 +20,7 @@ namespace Game.System
 				Vector2 pos, sca;
 				pos = camera.WorldToRenderPosition(transform.position);
 				sca = camera.WorldToRenderScale(transform.scale);
-				transform.angle += 1.75f;
+				//transform.angle += 1.75f;
 				if(transform.angle >= 360.0f)
 					transform.angle = 0.0f;
 					

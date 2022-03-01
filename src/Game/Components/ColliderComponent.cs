@@ -18,7 +18,10 @@ namespace Game.Component
 			target = _target;
 			normal = _normal;
 			depth = _depth;
-			contact_points = _contact_points.ToArray();
+			if(_contact_points == null)
+				contact_points = null;
+			else
+				contact_points = _contact_points.ToArray();
 			isB = _isB;
 		}
 	}

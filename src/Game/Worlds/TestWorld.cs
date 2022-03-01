@@ -8,7 +8,7 @@ namespace Game
 		private WorldCamera camera;
 		
 		private System.ColorPolygon system_colorPolygon;
-		
+		private System.Collision system_collision;
 		
 		private Resource.IPolygon center;
 		private Resource.IColor center_color;
@@ -20,29 +20,40 @@ namespace Game
 		{
 			camera = new WorldCamera(Vector2.Zero, 10.0f, Window.Width(), Window.Height());
 			system_colorPolygon = new System.ColorPolygon(Render, camera);
+			system_collision = new System.Collision();
 		}
 		public override void OnBegin()
 		{
 			ECS.Factory factory = new ECS.Factory();
-			factory.First_AddSystems(system_colorPolygon);
+			factory.First_AddSystems(system_colorPolygon, system_collision);
 			
 			
-			ECS.Archetype at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon));
+			ECS.Archetype at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon),typeof(Component.Collider));
 			
 			
-			for(int i=0; i<2500; i++)
+			for(int i=0; i<10; i++)
 			{
 				Byte[] col = URandom.Bytes(3);
 				
 				Vector2 position = URandom.Vector2(-3.0f,3.0f);
-				Vector2 scale = new Vector2(1.0f,1.0f);
-				float angle = URandom.Float(360.0f);
+				//Vector2 scale = new Vector2(1.0f,1.0f);
+				//float angle = URandom.Float(360.0f);
+				
+				//Vector2 position = new Vector2(i * 0.5f - 1.0f, 0.3f);
+				Vector2 scale = new Vector2(3.0f,2.0f);
+				float angle = 10.0f;
+				
+				Vector2[] vertices = new Vector2[3];
+				vertices[0] = new Vector2(-0.5f, -0.5f);
+				vertices[1] = new Vector2(-0.5f, 0.5f);
+				vertices[2] = new Vector2(0.5f, -0.5f);
 				
 				factory.SetComponentModels
 				(
 					at,
 					Component.Transform.Create(position,scale,angle),
-					Component.ColorPolygon.Default(Render).Color(255,col[0],col[1],col[2])
+					Component.ColorPolygon.Default(Render).Color(255,255,0,0),
+					Component.Collider.Polygon(vertices)
 				);
 				factory.CreateEntity(at);
 			}
@@ -75,7 +86,7 @@ namespace Game
 		//	Loop Events
 		public override void OnFrameBegin(){}
 		
-		public override void OnUpdateBeforeInput(){}
+		public override void OnUpdateBeforeInput(){ system_collision.Run(); }
 		public override void OnUpdateAfterInput(){}
 		public override void OnUpdateBeforeRender(){ camera.UpdateCamera(); }
 		public override void OnRender()
