@@ -31,9 +31,9 @@ namespace Game
 			ECS.Archetype at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon),typeof(Component.Collider));
 			
 			
-			for(int i=0; i<10; i++)
+			for(int i=0; i<2; i++)
 			{
-				Byte[] col = URandom.Bytes(3);
+				//Byte[] col = URandom.Bytes(3);
 				
 				Vector2 position = URandom.Vector2(-3.0f,3.0f);
 				//Vector2 scale = new Vector2(1.0f,1.0f);
@@ -52,7 +52,7 @@ namespace Game
 				(
 					at,
 					Component.Transform.Create(position,scale,angle),
-					Component.ColorPolygon.Default(Render).Color(255,255,0,0),
+					Component.ColorPolygon.Default(Render).Color(255,0,0,0),
 					Component.Collider.Polygon(vertices)
 				);
 				factory.CreateEntity(at);

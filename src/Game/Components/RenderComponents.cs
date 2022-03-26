@@ -4,6 +4,9 @@ namespace Game.Component
 {
 	public struct ColorPolygon : ECS.IComponentData
 	{
+		public SolidBrush brush;
+		public PointF[] points;
+		
 		public Resource.IPolygon polygon;
 		public Resource.IColor color;
 		
@@ -28,7 +31,13 @@ namespace Game.Component
 			return Create(renderModule, 255, 48, 101, 172, vertices);
 		}
 		
-		public void DeepCopy(){ polygon = polygon.Copy(); color = color.Copy(); }
+		public void DeepCopy()
+		{
+			if(points != null)
+				points = (Vector2[])points.Clone();
+			
+			brush = new SolidBrush(brush.Color);
+		}
 		public void SetFriend(int index){}
 	}
 	

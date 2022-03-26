@@ -2,9 +2,9 @@ using System;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace Module
+namespace System
 {
-	public sealed class WindowForm : Module.WindowBase
+	public sealed class Window
 	{
 		public struct Desc
 		{
@@ -27,39 +27,29 @@ namespace Module
 		//	Field ===============================================================================
 		public readonly Form Form;
 		
-		public WindowForm(Desc desc)
+		public Window(Desc desc)
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Form = new FormWrap(desc);
 		}
 		
-		private void ChangeTitle()
+		public void Initialize(LoopOrder loop_order)
 		{
-			Form.Text = string.Format("delta : {0}s ({1}ms) / {2}FPS / global : {3}s",Hull.Time.Delta(),Hull.Time.DeltaMs(),Hull.Time.Fps(),Hull.Time.Global());
-		}
-		
-		//	Base's ==============================================================================
-		public override void OnCreate(LoopOrder loop_order)
-		{
-			loop_order.Add(ChangeTitle,1);
 			loop_order.Add(Application.DoEvents,20);
 		}
-		public override void OnBegin(){}
-		public override void OnEnd(){}
-		public override void OnDispose(){}
 		
 		//	Window's ============================================================================
-		public override int Width(){ return Form.ClientSize.Width; }
-		public override int Height(){ return Form.ClientSize.Height; }
+		public int Width(){ return Form.ClientSize.Width; }
+		public int Height(){ return Form.ClientSize.Height; }
 		
-		public override bool IsCreated(){ return Form.Created; }
+		public bool IsCreated(){ return Form.Created; }
 		
-		public override void Show()
+		public void Show()
 		{
 			Form.Show();
 		}
-		public override void Exit()
+		public void Exit()
 		{
 			Application.Exit();
 		}

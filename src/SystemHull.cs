@@ -3,9 +3,11 @@ using System.Collections.Generic;
 
 public class SystemHull
 {
-	public readonly Module.WindowBase Window;
+	public readonly System.Window Window;
+	public readonly System.Draw Draw;
+	public readonly System.Input Input;
+	
 	public readonly Module.TimeBase Time;
-	public readonly Module.RenderBase Render;
 	
 	public readonly List<Module.Base> Modules;
 	
@@ -27,9 +29,8 @@ public class SystemHull
 	
 	public SystemHull
 	(
-		Module.WindowBase window,
+		System.Window.Desc window_desc,
 		Module.TimeBase time,
-		Module.RenderBase render,
 		params Module.Base[] args
 	)
 	{
@@ -37,13 +38,17 @@ public class SystemHull
 		LoopOrder loop_order = new LoopOrder();
 		Modules = new List<Module.Base>();
 		
-		Window = window;
-		Time = time;
-		Render = render;
+		this.Window = new System.Window(window_desc);
+		this.Draw = new System.Draw();
+		this.Input = new System.Input();
 		
-		Modules.Add(Window);
+		this.Time = time;
+		
+		this.Window.Initialize(loop_order);
+		this.Draw.Initialize(loop_order, this.Window.Form);
+		this.Input.Initialize(loop_order, this.Window.Form, this.Time);
+		
 		Modules.Add(Time);
-		Modules.Add(Render);
 		Modules.AddRange(args);
 		
 		//	Link & Set ID
@@ -86,6 +91,9 @@ public class SystemHull
 		//	Dispose
 		for(int i=Modules.Count-1; i>=0; i--)
 			Modules[i].OnDispose();
+		
+		Input.Dispose();
+		Draw.Dispose();
 		
 		Window.Exit();
 		Modules.Clear();

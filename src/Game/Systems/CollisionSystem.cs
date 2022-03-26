@@ -24,6 +24,8 @@ namespace Game.System
 					if(result == 1)
 					{
 						array3.datas[indices3[i]].color.SetR(0);
+						array3.datas[indices3[i]].color.SetG(255);
+						array3.datas[indices3[j]].color.SetR(0);
 						array3.datas[indices3[j]].color.SetG(255);
 					}
 
