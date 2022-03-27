@@ -68,8 +68,9 @@ namespace Module
 			{
 				w.WorldManager = this;
 				w.Window = Hull.Window;
+				w.Draw = Hull.Draw;
+				w.Input = Hull.Input;
 				w.Time = Hull.Time;
-				w.Render = Hull.Render;
 			}
 			
 			foreach(Module.WorldNode w in world_list)
@@ -113,9 +114,10 @@ namespace Module
 	{
 		public uint WorldID{ get; internal set; }
 		public Module.WorldManager WorldManager{ get; internal set; }
-		public Module.WindowBase Window{ get; internal set; }
+		public Module.Window Window{ get; internal set; }
+		public Module.Draw Draw{ get; internal set; }
+		public Module.Input Input{ get; internal set; }
 		public Module.TimeBase Time{ get; internal set; }
-		public Module.RenderBase Render{ get; internal set; }
 		
 		public abstract void OnEnable();
 		public abstract void OnDisable();

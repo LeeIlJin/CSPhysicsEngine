@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 public class SystemHull
 {
-	public readonly System.Window Window;
-	public readonly System.Draw Draw;
-	public readonly System.Input Input;
+	public readonly Module.Window Window;
+	public readonly Module.Draw Draw;
+	public readonly Module.Input Input;
 	
 	public readonly Module.TimeBase Time;
 	
@@ -29,7 +29,7 @@ public class SystemHull
 	
 	public SystemHull
 	(
-		System.Window.Desc window_desc,
+		Module.Window.Desc window_desc,
 		Module.TimeBase time,
 		params Module.Base[] args
 	)
@@ -38,9 +38,9 @@ public class SystemHull
 		LoopOrder loop_order = new LoopOrder();
 		Modules = new List<Module.Base>();
 		
-		this.Window = new System.Window(window_desc);
-		this.Draw = new System.Draw();
-		this.Input = new System.Input();
+		this.Window = new Module.Window(window_desc);
+		this.Draw = new Module.Draw();
+		this.Input = new Module.Input();
 		
 		this.Time = time;
 		

@@ -54,7 +54,7 @@ namespace Game
 		public Vector2 WorldToRenderScale(Vector2 s)
 		{
 			s.x *= xFactor;
-			s.y *= xFactor;
+			s.y *= -xFactor;
 			return s;
 		}
 		

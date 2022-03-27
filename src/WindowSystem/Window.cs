@@ -2,7 +2,7 @@ using System;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace System
+namespace Module
 {
 	public sealed class Window
 	{

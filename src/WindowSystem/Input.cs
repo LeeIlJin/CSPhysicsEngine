@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace System
+namespace Module
 {
 	public sealed class Input
 	{
@@ -17,20 +17,20 @@ namespace System
 		
 		private Module.TimeBase timer;
 		
-		public bool IsKeyPress(Keys code) {return instance.keyNodes[code]?.press ?? false;}
-		public bool IsKeyDown(Keys code) {return instance.keyNodes[code]?.down ?? false;}
-		public bool IsKeyUp(Keys code) {return instance.keyNodes[code]?.up ?? false;}
-		public float KeyPressElapsed(Keys code) {return instance.keyNodes[code]?.elapsed ?? 0.0f;}
+		public bool IsKeyPress(Keys code) {return this.keyNodes[code]?.press ?? false;}
+		public bool IsKeyDown(Keys code) {return this.keyNodes[code]?.down ?? false;}
+		public bool IsKeyUp(Keys code) {return this.keyNodes[code]?.up ?? false;}
+		public float KeyPressElapsed(Keys code) {return this.keyNodes[code]?.elapsed ?? 0.0f;}
 		
-		public bool IsMousePress(MouseButtons code) {return instance.mouseKeyNodes[code]?.press ?? false;}
-		public bool IsMouseDown(MouseButtons code) {return instance.mouseKeyNodes[code]?.down ?? false;}
-		public bool IsMouseUp(MouseButtons code) {return instance.mouseKeyNodes[code]?.up ?? false;}
-		public float MousePressElapsed(MouseButtons code) {return instance.mouseKeyNodes[code]?.elapsed ?? 0.0f;}
+		public bool IsMousePress(MouseButtons code) {return this.mouseKeyNodes[code]?.press ?? false;}
+		public bool IsMouseDown(MouseButtons code) {return this.mouseKeyNodes[code]?.down ?? false;}
+		public bool IsMouseUp(MouseButtons code) {return this.mouseKeyNodes[code]?.up ?? false;}
+		public float MousePressElapsed(MouseButtons code) {return this.mouseKeyNodes[code]?.elapsed ?? 0.0f;}
 		
-		public Vector2 MousePosition {get{return instance.mousePosition;}}
-		public Vector2 MousePriviousPosition {get{return instance.mousePriviousPosition;}}
-		public Vector2 MouseVector {get{return instance.mouseVector;}}
-		public bool IsMouseMoving() {return instance.isMouseMoving;}
+		public Vector2 MousePosition {get{return this.mousePosition;}}
+		public Vector2 MousePriviousPosition {get{return this.mousePriviousPosition;}}
+		public Vector2 MouseVector {get{return this.mouseVector;}}
+		public bool IsMouseMoving() {return this.isMouseMoving;}
 		
 		public Input()
 		{
@@ -68,15 +68,15 @@ namespace System
 		
 		public void AddKey(Keys code)
 		{
-			if(instance.keyNodes.ContainsKey(code) == false)
-				instance.keyNodes.Add(code,new KeyNode());
+			if(this.keyNodes.ContainsKey(code) == false)
+				this.keyNodes.Add(code,new KeyNode());
 		}
 		
 		public void AddKeys(params Keys[] args)
 		{
 			foreach(Keys code in args) {
-				if(instance.keyNodes.ContainsKey(code) == false)
-					instance.keyNodes.Add(code,new KeyNode());
+				if(this.keyNodes.ContainsKey(code) == false)
+					this.keyNodes.Add(code,new KeyNode());
 			}
 		}
 		
@@ -129,9 +129,9 @@ namespace System
 		//	On Frame
 		private void BeforeApplicationEvent()
 		{
-			instance.isMouseMoving = false;
+			this.isMouseMoving = false;
 			
-			foreach(KeyValuePair<Keys,KeyNode> kvp in instance.keyNodes)
+			foreach(KeyValuePair<Keys,KeyNode> kvp in this.keyNodes)
 			{
 				if(kvp.Value.press)
 					kvp.Value.elapsed += timer.Delta();
@@ -141,7 +141,7 @@ namespace System
 					kvp.Value.up = false;
 			}
 			
-			foreach(KeyValuePair<MouseButtons,KeyNode> kvp in instance.mouseKeyNodes)
+			foreach(KeyValuePair<MouseButtons,KeyNode> kvp in this.mouseKeyNodes)
 			{
 				if(kvp.Value.press)
 					kvp.Value.elapsed += timer.Delta();

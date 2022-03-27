@@ -11,7 +11,7 @@ internal class EntryPoint
 		
 		SystemHull hull = new SystemHull
 		(
-			System.Window.Desc.Default,
+			Module.Window.Desc.Default,
 			new Module.TickTime( 1000 ),
 			new Module.WorldManager
 			(

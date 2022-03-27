@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace System
+namespace Module
 {
 	public sealed class Draw
 	{
@@ -13,6 +13,8 @@ namespace System
 		private Graphics drawGraphics;
 		private Image drawBackBuffer;
 		private Color drawBackColor;
+		
+		public Graphics Graphics{ get{ return drawGraphics; } }
 		
 		private void BeforeRender()
 		{
@@ -43,9 +45,3 @@ namespace System
 		}
 	}
 }
-
-/*
-	PointF temp = output[i];
-	output[i].X = temp.X * (float)Math.Cos(rad) - temp.Y * (float)Math.Sin(rad);
-	output[i].Y = temp.X * (float)Math.Sin(rad) + temp.Y * (float)Math.Cos(rad);
-*/

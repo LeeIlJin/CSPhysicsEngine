@@ -1,15 +1,16 @@
 using System;
+using System.Drawing;
 
 namespace Game.System
 {
 	public sealed class ColorPolygon : ECS.SystemBase<Component.Transform, Component.ColorPolygon>
 	{
-		private readonly Module.RenderBase renderer;
+		private readonly Module.Draw Draw;
 		private WorldCamera camera;
 		
-		public ColorPolygon(Module.RenderBase _renderer, WorldCamera _camera)
+		public ColorPolygon(Module.Draw _draw, WorldCamera _camera)
 		{
-			this.renderer = _renderer;
+			this.Draw = _draw;
 			this.camera = _camera;
 		}
 		
@@ -24,7 +25,15 @@ namespace Game.System
 				if(transform.angle >= 360.0f)
 					transform.angle = 0.0f;
 					
-				renderer.RenderColorPolygon(resource.polygon, resource.color, pos, sca, transform.angle);
+				//renderer.RenderColorPolygon(resource.polygon, resource.color, pos, sca, transform.angle);
+				
+				PointF[] points = new PointF[resource.points.Length];
+				for(int i=0; i<resource.points.Length; i++)
+				{
+					points[i] = UMath.Transform(resource.points[i], pos, sca, transform.angle);
+				}
+				
+				Draw.Graphics.FillPolygon(resource.brush, points);
 			});
 		}
 		
@@ -35,4 +44,3 @@ namespace Game.System
 		public override void OnDispose() {}
 	}
 }
-	

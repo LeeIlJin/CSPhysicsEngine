@@ -1,0 +1,28 @@
+public override void RenderColorPolygon(Resource.IPolygon polygon, Resource.IColor color, Vector2 pos, Vector2 scale, float angle)
+		{
+			PolygonWrap pw = polygon as PolygonWrap;
+			if(pw == null)
+				return;
+			ColorWrap c = color as ColorWrap;
+			if(c == null)
+				return;
+			
+			pw.Scaling(scale);
+			pw.Rotate(angle);
+			pw.Translate(pos);
+			drawGraphics.FillPolygon(c.brush, pw.output);
+		}
+		public override void RenderColorCircle(Resource.ICircle circle, Resource.IColor color, Vector2 pos, Vector2 scale)
+		{
+			CircleWrap cw = circle as CircleWrap;
+			if(cw == null)
+				return;
+			ColorWrap c = color as ColorWrap;
+			if(c == null)
+				return;
+			
+			cw.Scaling(scale);
+			cw.Translate(pos);
+			drawGraphics.FillEllipse(c.brush, cw.x, cw.y, cw.width, cw.height);
+		}
+

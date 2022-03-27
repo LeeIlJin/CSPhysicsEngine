@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 
 public static class UMath
 {
@@ -80,5 +81,41 @@ public static class UMath
 		
 		float theta = (float)Math.Acos(dotp);
 		return (p1 * (float)Math.Sin((1.0f - r) * theta) + p2 * (float)Math.Sin(r * theta)) / (float)Math.Sin(theta);
+	}
+	
+	public static Vector2 Transform(Vector2 point, Vector2 position, Vector2 scale, float angle)
+	{
+		float rad = angle * D2R;
+		
+		Vector2 result = new Vector2(0.0f, 0.0f);
+		
+		point.x *= scale.x;
+		point.y *= scale.y;
+		
+		result.x = point.x * (float)Math.Cos(rad) - point.y * (float)Math.Sin(rad);
+		result.y = point.x * (float)Math.Sin(rad) + point.y * (float)Math.Cos(rad);
+		
+		result.x += position.x;
+		result.y += position.y;
+		
+		return result;
+	}
+	
+	public static PointF Transform(PointF point, Vector2 position, Vector2 scale, float angle)
+	{
+		float rad = angle * D2R;
+		
+		PointF result = new PointF(0.0f, 0.0f);
+		
+		point.X *= scale.x;
+		point.Y *= scale.y;
+		
+		result.X = point.X * (float)Math.Cos(rad) - point.Y * (float)Math.Sin(rad);
+		result.Y = point.X * (float)Math.Sin(rad) + point.Y * (float)Math.Cos(rad);
+		
+		result.X += position.x;
+		result.Y += position.y;
+		
+		return result;
 	}
 }
