@@ -1,5 +1,17 @@
 using System;
 
+/*
+	e = Bouncing Const Scalar
+	Inv_Mass = 1 / Mass
+	Inv_Inertia = 1 / Inertia
+	Inv_Inertia = Inv_Mass / (relative_AToP.Length ^ 2)
+	
+	velocity_AToB = B's Velocity - A's Velocity
+	relative_AToP = Contact Point - A's Center
+*/
+
+
+
 public static class Mechanics
 {
 	public enum RelativeState
@@ -18,6 +30,12 @@ public static class Mechanics
 			return RelativeState.Smashing;
 		// d > 0.0f
 		return RelativeState.Leaving;
+	}
+	
+	public static float GetInverseInertia(Vector2 rotate_axis, Vector2 mass_center, float inv_mass)
+	{
+		float r = Vector2.Distance(rotate_axis, mass_center);
+		return inv_mass / (r * r);
 	}
 	
 	//	Scalar J
@@ -48,7 +66,7 @@ public static class Mechanics
 	
 	public static float CalcAngularVelocity(float impulse_scalar, float inv_inertia, Vector2 r_CToP, Vector2 normal)
 	{
-		float d = Vector2.Dot(r_CToP,normal * impulse_scalar);
+		float d = Vector2.Dot(r_CToP, normal * impulse_scalar);
 		return d * inv_inertia;
 	}
 	

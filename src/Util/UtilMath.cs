@@ -62,6 +62,16 @@ public static class UMath
 		return b;
 	}
 	
+	public static float Pow2(float a)
+	{
+		return a * a;
+	}
+	
+	public static float Pow3(float a)
+	{
+		return a * a * a;
+	}
+	
 	public static float Repeat(float v, float min, float max)
 	{
 		return min + ((v - min) % (max - min));
