@@ -9,6 +9,18 @@ namespace Game.Component
 		public PointF[] points;
 		
 		public ColorPolygon ARGB(byte a, byte r, byte g, byte b){ brush.Color = Color.FromArgb(a,r,g,b); return this; }
+		public ColorPolygon RGB(byte r, byte g, byte b){ brush.Color = Color.FromArgb(255,r,g,b); return this; }
+		
+		public void SetA(byte a){ brush.Color = Color.FromArgb(a, this.R, this.G, this.B); }
+		public void SetR(byte r){ brush.Color = Color.FromArgb(this.A, r, this.G, this.B); }
+		public void SetG(byte g){ brush.Color = Color.FromArgb(this.A, this.R, g, this.B); }
+		public void SetB(byte b){ brush.Color = Color.FromArgb(this.A, this.R, this.G, b); }
+		
+		public byte A{ get{ return brush.Color.A; } }
+		public byte R{ get{ return brush.Color.R; } }
+		public byte G{ get{ return brush.Color.G; } }
+		public byte B{ get{ return brush.Color.B; } }
+		
 		
 		public static ColorPolygon Create(byte a, byte r, byte g, byte b, params Vector2[] args)
 		{
@@ -52,6 +64,18 @@ namespace Game.Component
 		public float radius;
 		
 		public ColorCircle ARGB(byte a, byte r, byte g, byte b){ brush.Color = Color.FromArgb(a,r,g,b); return this; }
+		public ColorCircle RGB(byte r, byte g, byte b){ brush.Color = Color.FromArgb(255,r,g,b); return this; }
+		
+		public void SetA(byte a){ brush.Color = Color.FromArgb(a, this.R, this.G, this.B); }
+		public void SetR(byte r){ brush.Color = Color.FromArgb(this.A, r, this.G, this.B); }
+		public void SetG(byte g){ brush.Color = Color.FromArgb(this.A, this.R, g, this.B); }
+		public void SetB(byte b){ brush.Color = Color.FromArgb(this.A, this.R, this.G, b); }
+		
+		public byte A{ get{ return brush.Color.A; } }
+		public byte R{ get{ return brush.Color.R; } }
+		public byte G{ get{ return brush.Color.G; } }
+		public byte B{ get{ return brush.Color.B; } }
+		
 		
 		public static ColorCircle Create(byte a, byte r, byte g, byte b, float radius_)
 		{

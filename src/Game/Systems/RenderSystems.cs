@@ -21,11 +21,6 @@ namespace Game.System
 				Vector2 pos, sca;
 				pos = camera.WorldToRenderPosition(transform.position);
 				sca = camera.WorldToRenderScale(transform.scale);
-				//transform.angle += 1.75f;
-				if(transform.angle >= 360.0f)
-					transform.angle = 0.0f;
-					
-				//renderer.RenderColorPolygon(resource.polygon, resource.color, pos, sca, transform.angle);
 				
 				PointF[] points = new PointF[resource.points.Length];
 				for(int i=0; i<resource.points.Length; i++)
@@ -34,6 +29,38 @@ namespace Game.System
 				}
 				
 				Draw.Graphics.FillPolygon(resource.brush, points);
+			});
+		}
+		
+		public override void OnBegin() {}
+		public override void OnEnable() {}
+		public override void OnDisable() {}
+		public override void OnEnd() {}
+		public override void OnDispose() {}
+	}
+	
+	public sealed class ColorCircle : ECS.SystemBase<Component.Transform, Component.ColorCircle>
+	{
+		private readonly Module.Draw Draw;
+		private WorldCamera camera;
+		
+		public ColorCircle(Module.Draw _draw, WorldCamera _camera)
+		{
+			this.Draw = _draw;
+			this.camera = _camera;
+		}
+		
+		public override void OnCreate()
+		{
+			ForEach((ref Component.Transform transform, ref Component.ColorCircle resource) =>
+			{
+				Vector2 pos, sca;
+				pos = camera.WorldToRenderPosition(transform.position);
+				sca = camera.WorldToRenderScale(transform.scale);
+				
+				float rad = UMath.Max(sca.x,sca.y) * resource.radius;
+				
+				Draw.Graphics.FillEllipse(resource.brush, pos.x, pos.y, rad, rad);
 			});
 		}
 		

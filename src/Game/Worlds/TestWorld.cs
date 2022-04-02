@@ -1,4 +1,5 @@
 using System;
+using System.Windows.Forms;
 
 namespace Game
 {
@@ -8,6 +9,10 @@ namespace Game
 		private WorldCamera camera;
 		
 		private System.ColorPolygon system_colorPolygon;
+		private System.ColorCircle system_colorCircle;
+		private System.Collision system_collision;
+		
+		private ECS.Entity player;
 		
 		public override void OnEnable(){}
 		public override void OnDisable(){}
@@ -16,17 +21,20 @@ namespace Game
 		{
 			camera = new WorldCamera(Vector2.Zero, 10.0f, Window.Width(), Window.Height());
 			system_colorPolygon = new System.ColorPolygon(Draw, camera);
+			system_colorCircle = new System.ColorCircle(Draw, camera);
+			system_collision = new System.Collision(Draw, camera);
+			
+			Input.AddKeys(Keys.Up, Keys.Down, Keys.Right, Keys.Left, Keys.Q, Keys.W);
 		}
 		public override void OnBegin()
 		{
 			ECS.Factory factory = new ECS.Factory();
-			factory.First_AddSystems(system_colorPolygon);
+			factory.First_AddSystems(system_colorPolygon, system_colorCircle, system_collision);
+			
+			ECS.Archetype at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon),typeof(Component.Collider));
 			
 			
-			ECS.Archetype at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon));
-			
-			
-			for(int i=0; i<2; i++)
+			for(int i=0; i<8; i++)
 			{
 				//Byte[] col = URandom.Bytes(3);
 				
@@ -35,8 +43,8 @@ namespace Game
 				//float angle = URandom.Float(360.0f);
 				
 				//Vector2 position = new Vector2(i * 0.5f - 1.0f, 0.3f);
-				Vector2 scale = new Vector2(3.0f,2.0f);
-				float angle = 0.0f;
+				Vector2 scale = new Vector2(1.0f,1.0f);
+				float angle = 5.0f;
 				
 				Vector2[] vertices = new Vector2[3];
 				vertices[0] = new Vector2(-0.5f, -0.5f);
@@ -47,10 +55,12 @@ namespace Game
 				(
 					at,
 					Component.Transform.Create(position,scale,angle),
-					Component.ColorPolygon.Default().ARGB(255,0,0,0)
+					Component.ColorPolygon.Default().ARGB(255,0,0,0),
+					Component.Collider.Polygon(vertices)
 				);
 				factory.CreateEntity(at);
 			}
+			player = factory.CreateEntity(at);
 			
 			ecs_manager = new ECS.Manager(factory);
 			factory.Dispose();
@@ -68,12 +78,37 @@ namespace Game
 		//	Loop Events
 		public override void OnFrameBegin(){}
 		
-		public override void OnUpdateBeforeInput(){}
-		public override void OnUpdateAfterInput(){}
+		public override void OnUpdateBeforeInput(){ system_collision.Run(); }
+		public override void OnUpdateAfterInput()
+		{
+			Component.Transform transform = player.GetComponent<Component.Transform>(ecs_manager);
+			float speed = 3.0f;
+			float anglespeed = 15.0f;
+			
+			if(Input.IsKeyPress(Keys.Right))
+				transform.position.x += speed * Time.Delta();
+			if(Input.IsKeyPress(Keys.Left))
+				transform.position.x -= speed * Time.Delta();
+			if(Input.IsKeyPress(Keys.Up))
+				transform.position.y += speed * Time.Delta();
+			if(Input.IsKeyPress(Keys.Down))
+				transform.position.y -= speed * Time.Delta();
+			
+			if(Input.IsKeyPress(Keys.Q))
+				transform.angle += anglespeed * Time.Delta();
+			if(Input.IsKeyPress(Keys.W))
+				transform.angle -= anglespeed * Time.Delta();
+			
+			transform.angle = UMath.ClampAngle(transform.angle);
+			
+			player.SetComponent<Component.Transform>(ecs_manager, transform);
+		}
 		public override void OnUpdateBeforeRender(){ camera.UpdateCamera(); }
 		public override void OnRender()
 		{
 			system_colorPolygon.Run();
+			system_colorCircle.Run();
+			system_collision.RenderDebug();
 		}
 		public override void OnUpdateAfterRender(){}
 		

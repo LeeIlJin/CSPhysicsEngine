@@ -380,10 +380,14 @@ namespace ECS
 			{
 				int[] gotIndex = system.GetTypeIndices(totalTypes);
 				if(gotIndex == null)
+				{
+					counter++;
 					continue;
+				}
 				
 				for(int i=0; i<gotIndex.Length; i++)
 					eSources[counter].Add(i,totalIndex[gotIndex[i]]);
+				
 				counter++;
 			}
 			

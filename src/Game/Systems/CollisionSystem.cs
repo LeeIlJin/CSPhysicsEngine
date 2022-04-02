@@ -1,18 +1,58 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace Game.System
 {
 	public sealed class Collision : ECS.SystemBase<Component.Transform, Component.Collider, Component.ColorPolygon>
 	{
+		private readonly Module.Draw Draw;
+		private WorldCamera camera;
+		private Pen debugPen;
+		
+		public Collision(Module.Draw _draw, WorldCamera _camera)
+		{
+			this.Draw = _draw;
+			this.camera = _camera;
+			this.debugPen = new Pen(Color.Blue, 3);
+		}
+		
+		public void RenderDebug()
+		{
+			for(int i=0; i<Length; i++)
+			{
+				Vector2[] vs = GetVertices(array1.datas[indices1[i]],array2.datas[indices2[i]]);
+				PointF[] ps = new PointF[vs.Length];
+				for(int x=0; x<vs.Length; x++)
+				{
+					ps[x] = new PointF(300 + vs[x].x * 30.0f, 300 + vs[x].y * 30.0f);
+				}
+				Draw.Graphics.DrawPolygon(debugPen, ps);
+				
+				
+				Vector2 pos, sca;
+				pos = camera.WorldToRenderPosition(array1.datas[indices1[i]].position);
+				sca = camera.WorldToRenderScale(array1.datas[indices1[i]].scale);
+				
+				PointF[] points = new PointF[array2.datas[indices2[i]].vertices.Length];
+				for(int j=0; j<array2.datas[indices2[i]].vertices.Length; j++)
+				{
+					Vector2 temp = UMath.Transform(array2.datas[indices2[i]].vertices[j], pos, sca, array1.datas[indices1[i]].angle);
+					points[j] = new PointF(temp.x, temp.y);
+				}
+				
+				Draw.Graphics.DrawPolygon(debugPen, points);
+			}
+		}
+		
 		public override void Run()
 		{
 			int result_case = 0;
 			for(int i=0; i<Length; i++)
 			{
 				array2[indices2[i]].results.Clear();
-				array3.datas[indices3[i]].color.SetR(255);
-				array3.datas[indices3[i]].color.SetG(0);
+				array3.datas[indices3[i]].SetR(255);
+				array3.datas[indices3[i]].SetG(0);
 			}
 			
 			
@@ -23,10 +63,10 @@ namespace Game.System
 					int result = TestInteraction(ref array1.datas[indices1[i]], ref array2.datas[indices2[i]], indices2[i], ref array1.datas[indices1[j]], ref array2.datas[indices2[j]], indices2[j]);
 					if(result == 1)
 					{
-						array3.datas[indices3[i]].color.SetR(0);
-						array3.datas[indices3[i]].color.SetG(255);
-						array3.datas[indices3[j]].color.SetR(0);
-						array3.datas[indices3[j]].color.SetG(255);
+						array3.datas[indices3[i]].SetR(0);
+						array3.datas[indices3[i]].SetG(255);
+						array3.datas[indices3[j]].SetR(0);
+						array3.datas[indices3[j]].SetG(255);
 					}
 
 					result_case += result;
@@ -139,13 +179,9 @@ namespace Game.System
 		private static Vector2[] GetVertices(Component.Transform transform, Component.Collider collider)
 		{
 			Vector2[] result = new Vector2[collider.vertices.Length];
-			float rad = transform.angle * UMath.D2R;
 			for(int i=0; i<result.Length; i++)
 			{
-				Vector2 temp = collider.vertices[i] * transform.scale;
-				result[i].x = temp.x * (float)Math.Cos(rad) - temp.y * (float)Math.Sin(rad);
-				result[i].y = temp.x * (float)Math.Sin(rad) + temp.y * (float)Math.Cos(rad);
-				result[i] += transform.position;
+				result[i] = UMath.Transform(collider.vertices[i], transform.position, transform.scale, -transform.angle);
 			}
 			return result;
 		}

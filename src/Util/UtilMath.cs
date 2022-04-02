@@ -20,6 +20,16 @@ public static class UMath
 		return radian * R2D;
 	}
 	
+	public static float ClampAngle(float degree)
+	{
+		if(degree < 0.0f)
+			return degree + 360.0f;
+		if(degree >= 360.0f)
+			return degree - 360.0f;
+		
+		return degree;
+	}
+	
 	public static float Clamp(float v, float min, float max)
 	{
 		if(v < min)
