@@ -76,7 +76,10 @@ namespace Game
 		
 		
 		//	Loop Events
-		public override void OnFrameBegin(){}
+		public override void OnFrameBegin()
+		{
+			Window.Form.Text = string.Format("delta : {0}s ({1}ms) / {2}FPS / global : {3}s",Time.Delta(), Time.DeltaMs(), Time.Fps(), Time.Global());
+		}
 		
 		public override void OnUpdateBeforeInput(){ system_collision.Run(); }
 		public override void OnUpdateAfterInput()

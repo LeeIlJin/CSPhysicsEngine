@@ -31,6 +31,7 @@ namespace Game.Component
 		public Vector2[] vertices;
 		public Vector2 center;
 		public float radius;
+		public bool trigger;
 		
 		public int layer;
 		public int[] target_layers;
