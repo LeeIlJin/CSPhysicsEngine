@@ -10,19 +10,16 @@ namespace Game.Component
 		public readonly Vector2 normal;
 		public readonly float depth;
 		
-		public readonly bool isB;
-		public bool isA{ get{ return !isB; } }
-		
-		public CollisionResult(int _target, Vector2 _normal, float _depth, List<Interaction.ClipPoint> _contact_points, bool _isB)
+		public CollisionResult(int _target, Vector2 _normal, float _depth, List<Interaction.ClipPoint> _contact_points)
 		{
 			target = _target;
 			normal = _normal;
 			depth = _depth;
+			
 			if(_contact_points == null)
 				contact_points = null;
 			else
 				contact_points = _contact_points.ToArray();
-			isB = _isB;
 		}
 	}
 	
@@ -31,6 +28,9 @@ namespace Game.Component
 		public Vector2[] vertices;
 		public Vector2 center;
 		public float radius;
+		
+		public Resource.PhysicsMaterial material;
+		
 		public bool trigger;
 		
 		public int layer;
@@ -41,6 +41,8 @@ namespace Game.Component
 		public bool isPolygon{ get{ return (vertices != null); } }
 		public bool isCircle{ get{ return (vertices == null); } }
 		
+		public Collider Material(Resource.PhysicsMaterial m){ material = m; return this; }
+		public Collider Trigger(bool b){ trigger = b; return this; }
 		public Collider Layer(int _layer){ layer = _layer; return this; }
 		public Collider TargetLayers(params int[] _layers){ target_layers = _layers; return this; }
 		
@@ -50,6 +52,8 @@ namespace Game.Component
 			{
 				center = _center,
 				radius = _radius,
+				material = Resource.PhysicsMaterial.Default(),
+				trigger = false,
 				vertices = _vertices,
 				layer = 0,
 				target_layers = null

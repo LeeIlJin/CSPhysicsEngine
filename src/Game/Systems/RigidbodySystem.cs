@@ -4,12 +4,11 @@ using System.Drawing;
 
 namespace Game.System
 {
-	public sealed class Collision : ECS.SystemBase<Component.Transform, Component.Collider>
+	public sealed class Rigidbody : ECS.SystemBase<Component.Transform, Component.Collider, Component.Rigidbody>
 	{
-		public Collision()
+		public Rigidbody()
 		{
-			//	Reject Rigidbody
-			SetRejectTypes(typeof(Component.Rigidbody));
+			
 		}
 		
 		public override void Run()
@@ -21,6 +20,7 @@ namespace Game.System
 			}
 			
 			
+			/*
 			for(int i=0; i<Length-1; i++)
 			{
 				for(int j=i+1; j<Length; j++)
@@ -34,8 +34,19 @@ namespace Game.System
 					result_case += result;
 				}
 			}
+			*/
 			
-			Console.WriteLine("Collision Result Case : {0}", result_case);
+			//	Writing...
+			for(int i=0; i<array2.datas.Length; i++)
+			{
+				for(int j=0; j<Length; j++)
+				{
+					if(i >= indices2[j]) // Avoid retest
+						continue;
+					
+					
+				}
+			}
 		}
 		
 		public override void OnCreate() {}

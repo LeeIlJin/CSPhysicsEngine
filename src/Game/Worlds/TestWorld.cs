@@ -22,7 +22,7 @@ namespace Game
 			camera = new WorldCamera(Vector2.Zero, 10.0f, Window.Width(), Window.Height());
 			system_colorPolygon = new System.ColorPolygon(Draw, camera);
 			system_colorCircle = new System.ColorCircle(Draw, camera);
-			system_collision = new System.Collision(Draw, camera);
+			system_collision = new System.Collision();
 			
 			Input.AddKeys(Keys.Up, Keys.Down, Keys.Right, Keys.Left, Keys.Q, Keys.W);
 		}
@@ -111,7 +111,6 @@ namespace Game
 		{
 			system_colorPolygon.Run();
 			system_colorCircle.Run();
-			system_collision.RenderDebug();
 		}
 		public override void OnUpdateAfterRender(){}
 		
