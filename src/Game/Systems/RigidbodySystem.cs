@@ -1,11 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 
 namespace Game.System
 {
 	public sealed class Rigidbody : ECS.SystemBase<Component.Transform, Component.Collider, Component.Rigidbody>
 	{
+		private struct CollisionResolveNode
+		{
+			public int AIndex;
+			public int BIndex;
+			
+			public float AMassInv;
+			public float BMassInv;
+		}
+		
 		public Rigidbody()
 		{
 			
@@ -36,17 +44,20 @@ namespace Game.System
 			}
 			*/
 			
-			//	Writing...
-			for(int i=0; i<array2.datas.Length; i++)
+			//	Rigidbody vs Rigidbody
+			for(int i=0; i<Length-1; i++)
 			{
-				for(int j=0; j<Length; j++)
+				for(int j=i+1; j<Length; j++)
 				{
-					if(i >= indices2[j]) // Avoid retest
-						continue;
-					
-					
+					int result = Game.System.Util.TestInteractionCollider(ref array1.datas[indices1[i]], ref array2.datas[indices2[i]], indices2[i], ref array1.datas[indices1[j]], ref array2.datas[indices2[j]], indices2[j]);
+					if(result == 1)
+					{
+						//Collision!
+					}
 				}
 			}
+			
+			
 		}
 		
 		public override void OnCreate() {}

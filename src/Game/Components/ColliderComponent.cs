@@ -31,6 +31,7 @@ namespace Game.Component
 		
 		public Resource.PhysicsMaterial material;
 		
+		public bool have_rigidbody;
 		public bool trigger;
 		
 		public int layer;
@@ -42,6 +43,7 @@ namespace Game.Component
 		public bool isCircle{ get{ return (vertices == null); } }
 		
 		public Collider Material(Resource.PhysicsMaterial m){ material = m; return this; }
+		public Collider HaveRigidbody(bool b){ have_rigidbody = b; return this; }
 		public Collider Trigger(bool b){ trigger = b; return this; }
 		public Collider Layer(int _layer){ layer = _layer; return this; }
 		public Collider TargetLayers(params int[] _layers){ target_layers = _layers; return this; }
@@ -53,6 +55,7 @@ namespace Game.Component
 				center = _center,
 				radius = _radius,
 				material = Resource.PhysicsMaterial.Default(),
+				have_rigidbody = false,
 				trigger = false,
 				vertices = _vertices,
 				layer = 0,
