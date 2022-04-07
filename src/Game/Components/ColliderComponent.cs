@@ -29,6 +29,10 @@ namespace Game.Component
 		public Vector2 center;
 		public float radius;
 		
+		public Vector2[] transformed_vertices;
+		public Vector2 transformed_center;
+		public float transformed_radius;
+		
 		public Resource.PhysicsMaterial material;
 		
 		public bool have_rigidbody;
@@ -43,7 +47,6 @@ namespace Game.Component
 		public bool isCircle{ get{ return (vertices == null); } }
 		
 		public Collider Material(Resource.PhysicsMaterial m){ material = m; return this; }
-		public Collider HaveRigidbody(bool b){ have_rigidbody = b; return this; }
 		public Collider Trigger(bool b){ trigger = b; return this; }
 		public Collider Layer(int _layer){ layer = _layer; return this; }
 		public Collider TargetLayers(params int[] _layers){ target_layers = _layers; return this; }
@@ -99,6 +102,6 @@ namespace Game.Component
 				
 			results = new List<CollisionResult>();
 		}
-		public void SetFriend(int index){}
+		public void Notify(){ have_rigidbody = true; }
 	}
 }

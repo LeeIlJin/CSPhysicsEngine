@@ -7,49 +7,54 @@ namespace Game.System
 	{
 		private struct CollisionResolveNode
 		{
-			public int AIndex;
-			public int BIndex;
+			public int ACollider;
+			public int BCollider;
 			
-			public float AMassInv;
-			public float BMassInv;
+			public int ARigidbody;
+			public int BRigidbody;
 		}
+		private List<CollisionResolveNode> collisionResolveNodes;
 		
-		public Rigidbody()
+		public int TestCase;
+		
+		public Rigidbody(int testcase)
 		{
-			
+			collisionResolveNodes = List<CollisionResolveNode>();
+			TestCase = testcase;
 		}
 		
 		public override void Run()
 		{
 			int result_case = 0;
+			collisionResolveNodes.Clear();
 			for(int i=0; i<Length; i++)
 			{
 				array2[indices2[i]].results.Clear();
+				TransformCollider(ref array1[indices1[i]], ref array2[indices2[i]]);
 			}
 			
-			
-			/*
-			for(int i=0; i<Length-1; i++)
+			//	Collider vs Rigidbody
+			for(int i=0; i<array2.datas.Length; i++)
 			{
-				for(int j=i+1; j<Length; j++)
+				if(array2.datas[i].have_rigidbody)
+					continue;
+				
+				for(int j=0; j<Length; j++)
 				{
-					int result = System.Util.TestInteractionCollider(ref array1.datas[indices1[i]], ref array2.datas[indices2[i]], indices2[i], ref array1.datas[indices1[j]], ref array2.datas[indices2[j]], indices2[j]);
+					int result = Game.System.Util.TestInteractionCollider(ref array2.datas[i], i, ref array2.datas[indices2[j]], indices2[j]);
 					if(result == 1)
 					{
 						//Collision!
 					}
-					
-					result_case += result;
 				}
 			}
-			*/
 			
 			//	Rigidbody vs Rigidbody
 			for(int i=0; i<Length-1; i++)
 			{
 				for(int j=i+1; j<Length; j++)
 				{
-					int result = Game.System.Util.TestInteractionCollider(ref array1.datas[indices1[i]], ref array2.datas[indices2[i]], indices2[i], ref array1.datas[indices1[j]], ref array2.datas[indices2[j]], indices2[j]);
+					int result = Game.System.Util.TestInteractionCollider(ref array2.datas[indices2[i]], indices2[i], ref array2.datas[indices2[j]], indices2[j]);
 					if(result == 1)
 					{
 						//Collision!

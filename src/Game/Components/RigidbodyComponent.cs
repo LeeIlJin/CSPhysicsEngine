@@ -4,9 +4,6 @@ namespace Game.Component
 {
 	public struct Rigidbody : ECS.IComponentData
 	{
-		private int friends_index;
-		public int collider_index{ get{ return friends_index; } }
-		
 		public Vector2 velocity;
 		public float angular_velocity;
 
@@ -28,6 +25,6 @@ namespace Game.Component
 		}
 		
 		public void DeepCopy(){}
-		public void SetFriend(int index){ friends_index = index; }
+		public void Notify(){}
 	}
 }

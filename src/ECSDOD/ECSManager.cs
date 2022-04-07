@@ -115,12 +115,14 @@ namespace ECS
 		public EntitiesSource[] eSources;
 		
 		public IDictionary<Type,Type[]> togetherComponents;
+		public IDictionary<Type,Type[]> notifyComponents;
 		
 		public Factory()
 		{
 			cdaSources = new Dictionary<Type,IComponentDataArraySource>();
 			cModels = new Dictionary<Type,IComponentData>();
 			togetherComponents = new Dictionary<Type,Type[]>();
+			notifyComponents = new Dictionary<Type,Type[]>();
 		}
 		
 		public void Dispose()
@@ -145,6 +147,12 @@ namespace ECS
 			{
 				togetherComponents.Clear();
 				togetherComponents = null;
+			}
+			
+			if(notifyComponents != null)
+			{
+				notifyComponents.Clear();
+				notifyComponents = null;
 			}
 			
 			if(eSources != null)
@@ -205,6 +213,14 @@ namespace ECS
 				togetherComponents[own] = friends;
 			else
 				togetherComponents.Add(own,friends);
+		}
+		
+		public void SetNotifyComponent(Type own, params Type[] reporters)
+		{
+			if(notifyComponents.ContainsKey(own))
+				notifyComponents[own] = reporters;
+			else
+				notifyComponents.Add(own,reporters);
 		}
 		
 		public void SetComponentModel(Type type, IComponentData data)
@@ -342,6 +358,22 @@ namespace ECS
 					}
 					else
 						totalIndex[counter] = cdaSources[type].CreateData(null);
+					
+					if(notifyComponents.ContainsKey(type))
+					{
+						for(int i=0; i<notifyComponents[type].Length; i++)
+						{
+							for(int j=0; j<at.Types.Length; j++)
+							{
+								if(notifyComponents[type][i] == at.Types[j])
+								{
+									cdaSources[type].NotifyToComponent(totalIndex[counter]);
+								}
+							}
+						}
+					}
+					
+					
 					totalTypes[counter] = type;
 					counter++;
 				}
@@ -369,6 +401,21 @@ namespace ECS
 					}
 					
 					totalIndex[counter] = sat.Indices[t];
+					
+					if(notifyComponents.ContainsKey(type))
+					{
+						for(int i=0; i<notifyComponents[type].Length; i++)
+						{
+							for(int j=0; j<sat.Types.Length; j++)
+							{
+								if(notifyComponents[type][i] == sat.Types[j])
+								{
+									cdaSources[type].NotifyToComponent(totalIndex[counter]);
+								}
+							}
+						}
+					}
+					
 					totalTypes[counter] = type;
 					counter++;
 					t++;

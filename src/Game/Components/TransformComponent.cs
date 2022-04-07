@@ -28,7 +28,7 @@ namespace Game.Component
 		}
 		
 		public void DeepCopy(){}
-		public void SetFriend(int index){}
+		public void Notify(){}
 		
 	}
 }

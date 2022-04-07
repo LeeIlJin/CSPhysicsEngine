@@ -30,6 +30,7 @@ namespace Game
 		{
 			ECS.Factory factory = new ECS.Factory();
 			factory.First_AddSystems(system_colorPolygon, system_colorCircle, system_collision);
+			factory.SetNotifyComponent(typeof(Component.Collider), typeof(Component.Rigidbody));
 			
 			ECS.Archetype at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon),typeof(Component.Collider));
 			

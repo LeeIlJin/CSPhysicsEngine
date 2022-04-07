@@ -55,7 +55,7 @@ namespace Game.Component
 			
 			brush = new SolidBrush(brush.Color);
 		}
-		public void SetFriend(int index){}
+		public void Notify(){}
 	}
 	
 	public struct ColorCircle : ECS.IComponentData
@@ -96,6 +96,6 @@ namespace Game.Component
 			brush = new SolidBrush(brush.Color);
 		}
 		
-		public void SetFriend(int index){}
+		public void Notify(){}
 	}
 }

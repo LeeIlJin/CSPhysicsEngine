@@ -5,8 +5,18 @@ namespace Game.System
 {
 	public static class Util
 	{
-		public static int TestInteractionCollider(ref Component.Transform tA, ref Component.Collider cA, int iA, ref Component.Transform tB, ref Component.Collider cB, int iB)
+		public static void TransformCollider(ref Component.Transform t, ref Component.Collider c)
 		{
+			c.transformed_vertices = GetColliderVertices(t, c);
+			
+			c.transformed_center = c.center + t.position;
+			
+			c.transformed_radius = c.radius * t.size;
+		}
+		
+		
+		public static int TestInteractionCollider(ref Component.Collider cA, int iA, ref Component.Collider cB, int iB)
+		{	
 			bool AtargetB = false;
 			bool BtargetA = false;
 			
@@ -44,10 +54,7 @@ namespace Game.System
 			if(AtargetB == false && BtargetA == false)
 				return 0;
 			
-			Vector2 centerA = cA.center + tA.position;
-			Vector2 centerB = cB.center + tB.position;
-			
-			if((cA.radius * tA.size) + (cB.radius * tB.size) < Vector2.Distance(centerA, centerB))
+			if(cA.transformed_radius + cB.transformed_radius < Vector2.Distance(cA.transformed_center, cB.transformed_center))
 				return 0;
 			
 			//	Interaction Functions
@@ -58,11 +65,11 @@ namespace Game.System
 			//	List<ClipPoint> Clip(Circle a, Circle b, Edge epa_edge)
 			
 			Interaction.Shape shapeA, shapeB;
-			if(cA.isPolygon){ shapeA = new Interaction.Polygon(centerA, GetColliderVertices(tA, cA)); }
-			else{ shapeA = new Interaction.Circle(centerA, cA.radius * tA.size); }
+			if(cA.isPolygon){ shapeA = new Interaction.Polygon(cA.transformed_center, cA.transformed_vertices); }
+			else{ shapeA = new Interaction.Circle(cA.transformed_center, cA.transformed_radius); }
 			
-			if(cB.isPolygon){ shapeB = new Interaction.Polygon(centerB, GetColliderVertices(tB, cB)); }
-			else{ shapeB = new Interaction.Circle(centerB, cB.radius * tB.size); }
+			if(cB.isPolygon){ shapeB = new Interaction.Polygon(cB.transformed_center, cB.transformed_vertices); }
+			else{ shapeB = new Interaction.Circle(cB.transformed_center, cB.transformed_radius); }
 			
 			//	GJK
 			List<Vector2> simplex = Interaction.GJK(shapeA, shapeB);
@@ -113,4 +120,5 @@ namespace Game.System
 			return result;
 		}
 	}
+	
 }
