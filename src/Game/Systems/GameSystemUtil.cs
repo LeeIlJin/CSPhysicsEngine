@@ -14,6 +14,15 @@ namespace Game.System
 			c.transformed_radius = c.radius * t.size;
 		}
 		
+		/*
+		float CalcImpulseScalar(float e, float aInv_mass, float aInv_inertia, float bInv_mass, float bInv_inertia, Vector2 normal, Vector2 velocity_AToB, Vector2 r_AToP, Vector2 r_BToP)
+		
+		*/
+		
+		public static float CalcImpulseScalar(ref Component.Collider ac, ref Component.Collider bc, float a_mass_inv, float b_mass_inv, float a_inertia_inv, float b_inertia_inv)
+		{
+			
+		}
 		
 		public static int TestInteractionCollider(ref Component.Collider cA, int iA, ref Component.Collider cB, int iB)
 		{	
@@ -51,7 +60,7 @@ namespace Game.System
 			}
 			
 			
-			if(AtargetB == false && BtargetA == false)
+			if(AtargetB == false || BtargetA == false)
 				return 0;
 			
 			if(cA.transformed_radius + cB.transformed_radius < Vector2.Distance(cA.transformed_center, cB.transformed_center))

@@ -102,6 +102,6 @@ namespace Game.Component
 				
 			results = new List<CollisionResult>();
 		}
-		public void Notify(){ have_rigidbody = true; }
+		public void Notify(){ have_rigidbody = true; trigger = false; }
 	}
 }
