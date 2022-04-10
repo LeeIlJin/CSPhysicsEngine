@@ -36,20 +36,22 @@ namespace Game
 			
 			ECS.Archetype at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon),typeof(Component.Collider),typeof(Component.Rigidbody));
 			
+			Vector2 position, scale;
+			Vector2[] vertices;
 			
 			for(int i=0; i<8; i++)
 			{
 				//Byte[] col = URandom.Bytes(3);
 				
-				Vector2 position = URandom.Vector2(-3.0f,3.0f);
+				position = URandom.Vector2(-3.0f,3.0f);
 				//Vector2 scale = new Vector2(1.0f,1.0f);
 				//float angle = URandom.Float(360.0f);
 				
 				//Vector2 position = new Vector2(i * 0.5f - 1.0f, 0.3f);
-				Vector2 scale = new Vector2(1.0f,1.0f);
+				scale = new Vector2(1.0f,1.0f);
 				float angle = 5.0f;
 				
-				Vector2[] vertices = new Vector2[3];
+				vertices = new Vector2[3];
 				vertices[0] = new Vector2(-0.5f, -0.5f);
 				vertices[1] = new Vector2(-0.5f, 0.5f);
 				vertices[2] = new Vector2(0.5f, -0.5f);
@@ -65,6 +67,26 @@ namespace Game
 				factory.CreateEntity(at);
 			}
 			player = factory.CreateEntity(at);
+			
+			at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon),typeof(Component.Collider));
+			position = new Vector2(0.0f,-2.5f);
+			scale = new Vector2(10.0f,1.0f);
+			
+			vertices = new Vector2[4];
+			vertices[0] = new Vector2(-0.5f, -0.5f);
+			vertices[1] = new Vector2(-0.5f, 0.5f);
+			vertices[2] = new Vector2(0.5f, 0.5f);
+			vertices[3] = new Vector2(0.5f, -0.5f);
+			
+			factory.SetComponentModels
+			(
+				at,
+				Component.Transform.Create(position,scale,0.0f),
+				Component.ColorPolygon.Create(255,255,0,255,vertices),
+				Component.Collider.Polygon(vertices)
+			);
+			factory.CreateEntity(at);
+			
 			
 			ecs_manager = new ECS.Manager(factory);
 			factory.Dispose();

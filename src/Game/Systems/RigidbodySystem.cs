@@ -7,6 +7,9 @@ namespace Game.System
 	{
 		private struct CollisionResolveInfo
 		{
+			public int ATransform;
+			public int BTransform;
+			
 			public int ACollider;
 			public int BCollider;
 			
@@ -16,9 +19,11 @@ namespace Game.System
 		
 		private struct CollisionApplyInfo
 		{
+			public int Transform;
 			public int Rigidbody;
 			public Vector2 LinearVelocity;
 			public float AngularVelocity;
+			public Vector2 PenetrationVector;
 		}
 		
 		private List<CollisionResolveInfo> collisionResolveInfos;
@@ -44,7 +49,7 @@ namespace Game.System
 				array2[indices2[i]].results.Clear();
 				
 				//	Gravity Apply
-				array3.datas[indices3[i]].velocity.y -= array3.datas[indices3[i]].gravity_factor * DeltaTime() * 0.001f;
+				array3.datas[indices3[i]].velocity.y -= array3.datas[indices3[i]].gravity_factor * DeltaTime();
 				
 				array1.datas[indices1[i]].position = array1.datas[indices1[i]].position + array3.datas[indices3[i]].velocity * DeltaTime() * 0.5f;
 				array1.datas[indices1[i]].angle = array1.datas[indices1[i]].angle + array3.datas[indices3[i]].angular_velocity * DeltaTime() * 0.5f;
@@ -72,6 +77,8 @@ namespace Game.System
 						(
 							new CollisionResolveInfo
 							{
+								ATransform = indices1[j],
+								BTransform = -1,
 								ACollider = indices2[j],
 								BCollider = i,
 								ARigidbody = indices3[j],
@@ -97,6 +104,8 @@ namespace Game.System
 						(
 							new CollisionResolveInfo
 							{
+								ATransform = indices1[i],
+								BTransform = indices1[j],
 								ACollider = indices2[i],
 								BCollider = indices2[j],
 								ARigidbody = indices3[i],
@@ -163,32 +172,40 @@ namespace Game.System
 						float impulse = Mechanics.CalcImpulseScalar(e, a_mass_inv, a_inertia_inv, b_mass_inv, b_inertia_inv, results[j].normal, velocity_ab, relative_ap, relative_bp);
 						
 						//	Vector2 CalcLinearVelocity(float impulse_scalar, float inv_mass, Vector2 normal)
-						Vector2 linear_velocity = Mechanics.CalcLinearVelocity(impulse, a_mass_inv, results[j].normal);
+						Vector2 linear_velocity = Mechanics.CalcLinearVelocity(impulse, a_mass_inv, results[j].normal.negate);
 						//	float CalcAngularVelocity(float impulse_scalar, float inv_inertia, Vector2 r_CToP, Vector2 normal)
-						float angular_velocity = Mechanics.CalcAngularVelocity(impulse, a_inertia_inv, relative_ap, results[j].normal);
+						float angular_velocity = Mechanics.CalcAngularVelocity(impulse, a_inertia_inv, relative_ap, results[j].normal.negate);
+						
+						float depth = results[j].depth;
+						if(node.BRigidbody >= 0)
+							depth *= 0.5f;
 						
 						collisionApplyInfos.Add
 						(
 							new CollisionApplyInfo
 							{
+								Transform = node.ATransform,
 								Rigidbody = node.ARigidbody,
 								LinearVelocity = linear_velocity,
-								AngularVelocity = angular_velocity
+								AngularVelocity = angular_velocity,
+								PenetrationVector = results[j].normal.negate * depth
 							}
 						);
 						
 						if(node.BRigidbody >= 0)
 						{
-							linear_velocity = Mechanics.CalcLinearVelocity(impulse, b_mass_inv, results[j].normal.negate);
-							angular_velocity = Mechanics.CalcAngularVelocity(impulse, b_inertia_inv, relative_bp, results[j].normal.negate);
+							linear_velocity = Mechanics.CalcLinearVelocity(impulse, b_mass_inv, results[j].normal);
+							angular_velocity = Mechanics.CalcAngularVelocity(impulse, b_inertia_inv, relative_bp, results[j].normal);
 							
 							collisionApplyInfos.Add
 							(
 								new CollisionApplyInfo
 								{
+									Transform = node.BTransform,
 									Rigidbody = node.BRigidbody,
 									LinearVelocity = linear_velocity,
-									AngularVelocity = angular_velocity
+									AngularVelocity = angular_velocity,
+									PenetrationVector = results[j].normal * depth
 								}
 							);
 						}
@@ -203,9 +220,11 @@ namespace Game.System
 			//	Apply Resolve Result
 			for(int i=0; i<collisionApplyInfos.Count; i++)
 			{
+				array1.datas[collisionApplyInfos[i].Transform].position = array1.datas[collisionApplyInfos[i].Transform].position + collisionApplyInfos[i].PenetrationVector;
+				
 				// Apply it!
-				array3.datas[collisionApplyInfos[i].Rigidbody].velocity = array3.datas[collisionApplyInfos[i].Rigidbody].velocity + collisionApplyInfos[i].LinearVelocity * DeltaTime();
-				array3.datas[collisionApplyInfos[i].Rigidbody].angular_velocity = array3.datas[collisionApplyInfos[i].Rigidbody].angular_velocity + collisionApplyInfos[i].AngularVelocity * DeltaTime();
+				array3.datas[collisionApplyInfos[i].Rigidbody].velocity = array3.datas[collisionApplyInfos[i].Rigidbody].velocity + collisionApplyInfos[i].LinearVelocity;
+				array3.datas[collisionApplyInfos[i].Rigidbody].angular_velocity = array3.datas[collisionApplyInfos[i].Rigidbody].angular_velocity + collisionApplyInfos[i].AngularVelocity;
 				
 				Console.WriteLine("Apply Linear : {0} : {1}",collisionApplyInfos[i].LinearVelocity.x, collisionApplyInfos[i].LinearVelocity.y);
 				
@@ -215,7 +234,7 @@ namespace Game.System
 			for(int i=0; i<Length; i++)
 			{
 				array1.datas[indices1[i]].position = array1.datas[indices1[i]].position + array3.datas[indices3[i]].velocity * DeltaTime() * 0.5f;
-				array1.datas[indices1[i]].angle = array1.datas[indices1[i]].angle + array3.datas[indices3[i]].angular_velocity * DeltaTime() * 0.5f;
+				array1.datas[indices1[i]].angle = UMath.ClampAngle(array1.datas[indices1[i]].angle + array3.datas[indices3[i]].angular_velocity * DeltaTime() * 0.5f);
 			}
 		}
 		
