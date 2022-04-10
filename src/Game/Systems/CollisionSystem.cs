@@ -16,8 +16,8 @@ namespace Game.System
 			int result_case = 0;
 			for(int i=0; i<Length; i++)
 			{
-				array2[indices2[i]].results.Clear();
-				TransformCollider(ref array1[indices1[i]], ref array2[indices2[i]]);
+				array2.datas[indices2[i]].results.Clear();
+				Game.System.Util.TransformCollider(ref array1.datas[indices1[i]], ref array2.datas[indices2[i]]);
 			}
 			
 			

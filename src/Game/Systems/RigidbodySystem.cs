@@ -24,24 +24,34 @@ namespace Game.System
 		private List<CollisionResolveInfo> collisionResolveInfos;
 		private List<CollisionApplyInfo> collisionApplyInfos;
 		
+		public delegate float FloatOut();
+		private FloatOut DeltaTime;
 		public int TestCase;
 		
-		public Rigidbody(int testcase)
+		public Rigidbody(FloatOut delta_time_function, int testcase)
 		{
 			collisionResolveInfos = new List<CollisionResolveInfo>();
 			collisionApplyInfos = new List<CollisionApplyInfo>();
+			DeltaTime = delta_time_function;
 			TestCase = testcase;
 		}
 		
 		public override void Run()
 		{
-			int result_case = 0;
 			collisionResolveInfos.Clear();
 			for(int i=0; i<Length; i++)
 			{
 				array2[indices2[i]].results.Clear();
-				TransformCollider(ref array1[indices1[i]], ref array2[indices2[i]]);
+				
+				//	Gravity Apply
+				array3.datas[indices3[i]].velocity.y -= array3.datas[indices3[i]].gravity_factor * DeltaTime() * 0.001f;
+				
+				array1.datas[indices1[i]].position = array1.datas[indices1[i]].position + array3.datas[indices3[i]].velocity * DeltaTime() * 0.5f;
+				array1.datas[indices1[i]].angle = array1.datas[indices1[i]].angle + array3.datas[indices3[i]].angular_velocity * DeltaTime() * 0.5f;
+				
+				Game.System.Util.TransformCollider(ref array1.datas[indices1[i]], ref array2.datas[indices2[i]]);
 			}
+			
 			
 			//	Collider vs Rigidbody
 			for(int i=0; i<array2.datas.Length; i++)
@@ -60,17 +70,19 @@ namespace Game.System
 						
 						collisionResolveInfos.Add
 						(
-							new CollisionResolveNode
+							new CollisionResolveInfo
 							{
 								ACollider = indices2[j],
 								BCollider = i,
 								ARigidbody = indices3[j],
 								BRigidbody = -1
-							};
-						)
+							}
+						);
 					}
 				}
 			}
+			
+			
 			
 			//	Rigidbody vs Rigidbody
 			for(int i=0; i<Length-1; i++)
@@ -83,18 +95,20 @@ namespace Game.System
 						//Collision!
 						collisionResolveInfos.Add
 						(
-							new CollisionResolveNode
+							new CollisionResolveInfo
 							{
 								ACollider = indices2[i],
-								BCollider = incides2[j],
+								BCollider = indices2[j],
 								ARigidbody = indices3[i],
 								BRigidbody = indices3[j]
-							};
-						)
+							}
+						);
 					}
 				}
 			}
 			
+			
+			//	Calc Collision Resolve
 			collisionApplyInfos.Clear();
 			for(int i=0; i<collisionResolveInfos.Count; i++)
 			{
@@ -103,6 +117,8 @@ namespace Game.System
 				float a_mass_inv, b_mass_inv;
 				float a_inertia_inv, b_inertia_inv;
 				Vector2 velocity_ab;	// B Velocity - A Velocity
+				
+				float e = (array2.datas[node.ACollider].material.Bounciness + array2.datas[node.BCollider].material.Bounciness) / 2.0f;
 				
 				
 				a_mass_inv = array3.datas[node.ARigidbody].mass_inv;
@@ -118,14 +134,21 @@ namespace Game.System
 					velocity_ab = array3.datas[node.BRigidbody].velocity - array3.datas[node.ARigidbody].velocity;
 				} // B Is Rigidbody
 				
-				List<CollisionResult> results = array2.datas[node.ACollider].results;
+				
+				//=================================================================================
+				
+				List<Component.CollisionResult> results = array2.datas[node.ACollider].results;
 				for(int j=0; j<results.Count; j++)
 				{
 					Vector2 relative_ap;	// Contact Point - A Center Position
 					Vector2 relative_bp;	// Contact Point - B Center Position
 					
+					if(results[j].contact_points == null)
+						continue;
+					
 					for(int k=0; k<results[j].contact_points.Length; k++)
 					{
+						
 						relative_ap = results[j].contact_points[k].point - array2.datas[node.ACollider].transformed_center;
 						relative_bp = results[j].contact_points[k].point - array2.datas[node.BCollider].transformed_center;
 						
@@ -146,9 +169,12 @@ namespace Game.System
 						
 						collisionApplyInfos.Add
 						(
-							Rigidbody = node.ARigidbody,
-							LinearVelocity = linear_velocity,
-							AngularVelocity = angular_velocity
+							new CollisionApplyInfo
+							{
+								Rigidbody = node.ARigidbody,
+								LinearVelocity = linear_velocity,
+								AngularVelocity = angular_velocity
+							}
 						);
 						
 						if(node.BRigidbody >= 0)
@@ -158,18 +184,38 @@ namespace Game.System
 							
 							collisionApplyInfos.Add
 							(
-								Rigidbody = node.BRigidbody,
-								LinearVelocity = linear_velocity,
-								AngularVelocity = angular_velocity
+								new CollisionApplyInfo
+								{
+									Rigidbody = node.BRigidbody,
+									LinearVelocity = linear_velocity,
+									AngularVelocity = angular_velocity
+								}
 							);
 						}
+						
+						
 					}
 				}
 			}
 			
+			
+			
+			//	Apply Resolve Result
 			for(int i=0; i<collisionApplyInfos.Count; i++)
 			{
 				// Apply it!
+				array3.datas[collisionApplyInfos[i].Rigidbody].velocity = array3.datas[collisionApplyInfos[i].Rigidbody].velocity + collisionApplyInfos[i].LinearVelocity * DeltaTime();
+				array3.datas[collisionApplyInfos[i].Rigidbody].angular_velocity = array3.datas[collisionApplyInfos[i].Rigidbody].angular_velocity + collisionApplyInfos[i].AngularVelocity * DeltaTime();
+				
+				Console.WriteLine("Apply Linear : {0} : {1}",collisionApplyInfos[i].LinearVelocity.x, collisionApplyInfos[i].LinearVelocity.y);
+				
+				Console.WriteLine("Apply Angular : {0}",collisionApplyInfos[i].AngularVelocity);
+			}
+			
+			for(int i=0; i<Length; i++)
+			{
+				array1.datas[indices1[i]].position = array1.datas[indices1[i]].position + array3.datas[indices3[i]].velocity * DeltaTime() * 0.5f;
+				array1.datas[indices1[i]].angle = array1.datas[indices1[i]].angle + array3.datas[indices3[i]].angular_velocity * DeltaTime() * 0.5f;
 			}
 		}
 		

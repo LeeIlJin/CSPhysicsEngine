@@ -19,10 +19,6 @@ namespace Game.System
 		
 		*/
 		
-		public static float CalcImpulseScalar(ref Component.Collider ac, ref Component.Collider bc, float a_mass_inv, float b_mass_inv, float a_inertia_inv, float b_inertia_inv)
-		{
-			
-		}
 		
 		public static int TestInteractionCollider(ref Component.Collider cA, int iA, ref Component.Collider cB, int iB)
 		{	

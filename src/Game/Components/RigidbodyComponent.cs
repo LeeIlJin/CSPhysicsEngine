@@ -23,7 +23,12 @@ namespace Game.Component
 		{
 			return new Rigidbody
 			{
-				
+				velocity = new Vector2(0.0f,0.0f),
+				angular_velocity = 0.0f,
+				mass_inv = 1.0f,
+				gravity_factor = 9.81f,
+				drag_factor = 0.2f,
+				fix_angle = false
 			};
 		}
 		

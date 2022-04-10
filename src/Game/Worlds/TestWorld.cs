@@ -11,6 +11,7 @@ namespace Game
 		private System.ColorPolygon system_colorPolygon;
 		private System.ColorCircle system_colorCircle;
 		private System.Collision system_collision;
+		private System.Rigidbody system_rigidbody;
 		
 		private ECS.Entity player;
 		
@@ -23,16 +24,17 @@ namespace Game
 			system_colorPolygon = new System.ColorPolygon(Draw, camera);
 			system_colorCircle = new System.ColorCircle(Draw, camera);
 			system_collision = new System.Collision();
+			system_rigidbody = new System.Rigidbody(Time.Delta,0);
 			
 			Input.AddKeys(Keys.Up, Keys.Down, Keys.Right, Keys.Left, Keys.Q, Keys.W);
 		}
 		public override void OnBegin()
 		{
 			ECS.Factory factory = new ECS.Factory();
-			factory.First_AddSystems(system_colorPolygon, system_colorCircle, system_collision);
+			factory.First_AddSystems(system_colorPolygon, system_colorCircle, system_collision, system_rigidbody);
 			factory.SetNotifyComponent(typeof(Component.Collider), typeof(Component.Rigidbody));
 			
-			ECS.Archetype at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon),typeof(Component.Collider));
+			ECS.Archetype at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon),typeof(Component.Collider),typeof(Component.Rigidbody));
 			
 			
 			for(int i=0; i<8; i++)
@@ -57,7 +59,8 @@ namespace Game
 					at,
 					Component.Transform.Create(position,scale,angle),
 					Component.ColorPolygon.Default().ARGB(255,0,0,0),
-					Component.Collider.Polygon(vertices)
+					Component.Collider.Polygon(vertices),
+					Component.Rigidbody.Create()
 				);
 				factory.CreateEntity(at);
 			}
@@ -82,7 +85,7 @@ namespace Game
 			Window.Form.Text = string.Format("delta : {0}s ({1}ms) / {2}FPS / global : {3}s",Time.Delta(), Time.DeltaMs(), Time.Fps(), Time.Global());
 		}
 		
-		public override void OnUpdateBeforeInput(){ system_collision.Run(); }
+		public override void OnUpdateBeforeInput(){ system_collision.Run(); system_rigidbody.Run(); }
 		public override void OnUpdateAfterInput()
 		{
 			Component.Transform transform = player.GetComponent<Component.Transform>(ecs_manager);
