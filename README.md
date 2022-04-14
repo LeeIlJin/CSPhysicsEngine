@@ -1,5 +1,7 @@
 # CSPhysicsEngine
   
+군대 싸지방에서 GoormIDE로 만들고 있습니다. (C++ 하고 싶다..)
+  
   
 ### How to use my ECS DOD
 - Declare and Assign : `ECS.Factory = new ECS.Factory()`.
