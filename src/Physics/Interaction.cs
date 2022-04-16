@@ -99,14 +99,6 @@ public static class Interaction
 		return av - bv;
 	}
 	
-	private static Vector2 TripleProduct(Vector2 a, Vector2 b, Vector2 c)
-	{
-		float ac = Vector2.Dot(a,c);
-		float bc = Vector2.Dot(b,c);
-		
-		return b * ac - a * bc;
-	}
-	
 	private static Edge FindClosestEdge(List<Vector2> simplex)
 	{
 		Edge closest = new Edge();
@@ -119,7 +111,7 @@ public static class Interaction
 			Vector2 ab = simplex[j] - simplex[i];
 			Vector2 oa = simplex[i];
 			
-			Vector2 n = TripleProduct(ab,oa,ab);
+			Vector2 n = Vector2.TripleProduct(ab,oa,ab);
 			n.SetNormalize();
 			
 			float d = Vector2.Dot(n,simplex[i]);
@@ -220,7 +212,7 @@ public static class Interaction
 			if(index < 2)
 			{
 				sab = simplex[0] - simplex[1];
-				dir = TripleProduct(sab,sao,sab);
+				dir = Vector2.TripleProduct(sab,sao,sab);
 				if(dir.lengthSquared == 0.0f)
 					dir = sab.right;
 				continue;
@@ -229,12 +221,12 @@ public static class Interaction
 			sab = simplex[1] - simplex[2];
 			sac = simplex[0] - simplex[2];
 			
-			Vector2 sacperp = TripleProduct(sab,sac,sac);
+			Vector2 sacperp = Vector2.TripleProduct(sab,sac,sac);
 			if(Vector2.Dot(sacperp,sao) >= 0)
 				dir = sacperp;
 			else
 			{
-				Vector2 sabperp = TripleProduct(sac,sab,sab);
+				Vector2 sabperp = Vector2.TripleProduct(sac,sab,sab);
 				if(Vector2.Dot(sabperp,sao) < 0)
 					return simplex;
 				simplex[0] = simplex[1];

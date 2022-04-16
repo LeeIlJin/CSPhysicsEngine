@@ -20,11 +20,11 @@ namespace Game
 		
 		public override void OnCreate()
 		{
-			camera = new WorldCamera(Vector2.Zero, 10.0f, Window.Width(), Window.Height());
+			camera = new WorldCamera(Vector2.Zero, 50.0f, Window.Width(), Window.Height());
 			system_colorPolygon = new System.ColorPolygon(Draw, camera);
 			system_colorCircle = new System.ColorCircle(Draw, camera);
 			system_collision = new System.Collision();
-			system_rigidbody = new System.Rigidbody(Time.Delta,0);
+			system_rigidbody = new System.Rigidbody(Time.Delta);
 			
 			Input.AddKeys(Keys.Up, Keys.Down, Keys.Right, Keys.Left, Keys.Q, Keys.W);
 		}
@@ -48,19 +48,20 @@ namespace Game
 				//float angle = URandom.Float(360.0f);
 				
 				//Vector2 position = new Vector2(i * 0.5f - 1.0f, 0.3f);
-				scale = new Vector2(1.0f,1.0f);
+				scale = new Vector2(1.5f,1.0f);
 				float angle = 5.0f;
 				
-				vertices = new Vector2[3];
+				vertices = new Vector2[4];
 				vertices[0] = new Vector2(-0.5f, -0.5f);
 				vertices[1] = new Vector2(-0.5f, 0.5f);
-				vertices[2] = new Vector2(0.5f, -0.5f);
+				vertices[2] = new Vector2(0.5f, 0.5f);
+				vertices[3] = new Vector2(0.5f, -0.5f);
 				
 				factory.SetComponentModels
 				(
 					at,
 					Component.Transform.Create(position,scale,angle),
-					Component.ColorPolygon.Default().ARGB(255,0,0,0),
+					Component.ColorPolygon.Create(255,0,255,0,vertices),
 					Component.Collider.Polygon(vertices),
 					Component.Rigidbody.Create()
 				);
@@ -69,8 +70,8 @@ namespace Game
 			player = factory.CreateEntity(at);
 			
 			at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon),typeof(Component.Collider));
-			position = new Vector2(0.0f,-2.5f);
-			scale = new Vector2(10.0f,1.0f);
+			position = new Vector2(0.0f,-3.5f);
+			scale = new Vector2(100.0f,1.0f);
 			
 			vertices = new Vector2[4];
 			vertices[0] = new Vector2(-0.5f, -0.5f);

@@ -38,23 +38,35 @@ public static class Mechanics
 		return inv_mass / (r * r);
 	}
 	
+	/*
+	public static Vector2 TripleProduct(Vector2 a, Vector2 b, Vector2 c) //	(A X B) X C
+	{
+		float ac = Vector2.Dot(a,c); (a.x * c.x) + (a.y * c.y)
+		float bc = Vector2.Dot(b,c); (b.x * c.x) + (b.y * c.y)
+		return b * ac - a * bc;
+	}
+	*/
+	
 	//	Scalar J
 	public static float CalcImpulseScalar(float e, float aInv_mass, float aInv_inertia, float bInv_mass, float bInv_inertia,
 										  Vector2 normal, Vector2 velocity_AToB, Vector2 r_AToP, Vector2 r_BToP)
 	{
-		float temp = Vector2.Dot(velocity_AToB,normal);
+		float temp = Vector2.Dot(velocity_AToB, normal);
 		if(temp == 0.0f)
 			return 0.0f;
 		float up = temp * -(1.0f + e);
 		
-		temp = aInv_mass + bInv_mass;
-		float down = Vector2.Dot(normal,normal * temp);
+		float down = aInv_mass + bInv_mass;
 		
-		float d = Vector2.Dot(r_AToP,normal);
-		down += d * d * aInv_inertia;
+		Vector2 a = r_AToP * aInv_inertia;
+		Vector2 b = normal * aInv_inertia;
+		Vector2 ai = Vector2.TripleProduct(a,b,r_AToP);
 		
-		d = Vector2.Dot(r_BToP,normal);
-		down += d * d * bInv_inertia;
+		a = r_BToP * bInv_inertia;
+		Vector2 bi = Vector2.TripleProduct(a,b,r_BToP);
+		
+		float d = Vector2.Dot(ai + bi,normal);
+		down += d;
 		
 		return up / down;
 	}
@@ -66,7 +78,7 @@ public static class Mechanics
 	
 	public static float CalcAngularVelocity(float impulse_scalar, float inv_inertia, Vector2 r_CToP, Vector2 normal)
 	{
-		float d = Vector2.Dot(r_CToP, normal * impulse_scalar);
+		float d = Vector2.Cross(r_CToP, normal * impulse_scalar);
 		return d * inv_inertia;
 	}
 	

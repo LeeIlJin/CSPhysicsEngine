@@ -103,9 +103,9 @@ public static class UMath
 		return (p1 * (float)Math.Sin((1.0f - r) * theta) + p2 * (float)Math.Sin(r * theta)) / (float)Math.Sin(theta);
 	}
 	
-	public static Vector2 Transform(Vector2 point, Vector2 position, Vector2 scale, float angle)
+	public static Vector2 Transform(Vector2 point, Vector2 position, Vector2 scale, float rad)
 	{
-		float rad = angle * D2R;
+		//float rad = angle * D2R;
 		
 		Vector2 result = new Vector2(0.0f, 0.0f);
 		

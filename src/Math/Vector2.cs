@@ -42,6 +42,13 @@ public struct Vector2
 	
 	public static float Dot(Vector2 a, Vector2 b){ return (a.x * b.x) + (a.y * b.y); }
 	public static float Cross(Vector2 a, Vector2 b){ return (a.x * b.y) - (a.y * b.x); }
+	public static Vector2 TripleProduct(Vector2 a, Vector2 b, Vector2 c) //	(A X B) X C
+	{
+		float ac = Vector2.Dot(a,c);
+		float bc = Vector2.Dot(b,c);
+		
+		return b * ac - a * bc;
+	}
 	public static float Distance(Vector2 a, Vector2 b){ return (b - a).Length(); }
 	
 	public float Length(){ return (float)Math.Sqrt(x * x + y * y); }

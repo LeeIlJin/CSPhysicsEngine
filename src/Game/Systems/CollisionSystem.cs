@@ -17,7 +17,7 @@ namespace Game.System
 			for(int i=0; i<Length; i++)
 			{
 				array2.datas[indices2[i]].results.Clear();
-				Game.System.Util.TransformCollider(ref array1.datas[indices1[i]], ref array2.datas[indices2[i]]);
+				Game.System.Util.TransformCollider(ref array1.datas[indices1[i]], ref array2.datas[indices2[i]], Vector2.Zero, 0.0f);
 			}
 			
 			

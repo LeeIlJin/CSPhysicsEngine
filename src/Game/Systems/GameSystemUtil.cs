@@ -5,20 +5,17 @@ namespace Game.System
 {
 	public static class Util
 	{
-		public static void TransformCollider(ref Component.Transform t, ref Component.Collider c)
+		public static void TransformCollider(ref Component.Transform t, ref Component.Collider c , Vector2 velocity, float angular_velocity)
 		{
-			c.transformed_vertices = GetColliderVertices(t, c);
+			Vector2 pos = t.position + velocity;
+			float angle = t.angle + angular_velocity;
+			
+			c.transformed_vertices = GetColliderVertices(c, pos, t.scale, angle);
 			
 			c.transformed_center = c.center + t.position;
 			
 			c.transformed_radius = c.radius * t.size;
 		}
-		
-		/*
-		float CalcImpulseScalar(float e, float aInv_mass, float aInv_inertia, float bInv_mass, float bInv_inertia, Vector2 normal, Vector2 velocity_AToB, Vector2 r_AToP, Vector2 r_BToP)
-		
-		*/
-		
 		
 		public static int TestInteractionCollider(ref Component.Collider cA, int iA, ref Component.Collider cB, int iB)
 		{	
@@ -115,12 +112,12 @@ namespace Game.System
 		}
 		
 		
-		public static Vector2[] GetColliderVertices(Component.Transform transform, Component.Collider collider)
+		public static Vector2[] GetColliderVertices(Component.Collider collider, Vector2 position, Vector2 scale, float angle)
 		{
 			Vector2[] result = new Vector2[collider.vertices.Length];
 			for(int i=0; i<result.Length; i++)
 			{
-				result[i] = UMath.Transform(collider.vertices[i], transform.position, transform.scale, -transform.angle);
+				result[i] = UMath.Transform(collider.vertices[i], position, scale, angle);
 			}
 			return result;
 		}
