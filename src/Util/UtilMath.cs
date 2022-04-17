@@ -20,16 +20,6 @@ public static class UMath
 		return radian * R2D;
 	}
 	
-	public static float ClampAngle(float degree)
-	{
-		if(degree < 0.0f)
-			return degree + 360.0f;
-		if(degree >= 360.0f)
-			return degree - 360.0f;
-		
-		return degree;
-	}
-	
 	public static float Clamp(float v, float min, float max)
 	{
 		if(v < min)
@@ -77,6 +67,15 @@ public static class UMath
 		return min + ((v - min) % (max - min));
 	}
 	
+	public static float RepeatRadian(float rad)
+	{
+		if(rad < 0.0f)
+			return rad + PI2;
+		if(rad >= PI2)
+			return rad - PI2;
+		return rad;
+	}
+	
 	public static float Lerp(float p1, float p2, float r)
 	{
 		r = UMath.Clamp01(r);
@@ -121,9 +120,9 @@ public static class UMath
 		return result;
 	}
 	
-	public static PointF Transform(PointF point, Vector2 position, Vector2 scale, float angle)
+	public static PointF Transform(PointF point, Vector2 position, Vector2 scale, float rad)
 	{
-		float rad = angle * D2R;
+		//float rad = angle * D2R;
 		
 		PointF result = new PointF(0.0f, 0.0f);
 		

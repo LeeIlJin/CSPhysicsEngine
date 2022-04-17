@@ -1,6 +1,10 @@
 using System;
 
 /*
+	https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf
+	https://pt.slideshare.net/ohyecloudy/ndc12-12668524
+
+
 	e = Bouncing Const Scalar
 	Inv_Mass = 1 / Mass
 	Inv_Inertia = 1 / Inertia
@@ -103,5 +107,11 @@ public static class Mechanics
 	{
 		float vsquared = velocity.lengthSquared;
 		return velocity.normalize * (pop * vsquared * face * drag_factor * -0.5f);
+	}
+	
+	public static float CalcAngularDrag(float drag_factor, float angular_velocity, float face = 1.0f, float pop = 1.0f)
+	{
+		float sign = Math.Sign(angular_velocity);
+		return sign * (pop * angular_velocity * angular_velocity * face * drag_factor * -0.5f);
 	}
 }

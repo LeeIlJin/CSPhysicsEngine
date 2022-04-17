@@ -25,7 +25,7 @@ namespace Game.System
 				PointF[] points = new PointF[resource.points.Length];
 				for(int i=0; i<resource.points.Length; i++)
 				{
-					points[i] = UMath.Transform(resource.points[i], pos, sca, -transform.angle);
+					points[i] = UMath.Transform(resource.points[i], pos, sca, -transform.radian);
 				}
 				
 				Draw.Graphics.FillPolygon(resource.brush, points);

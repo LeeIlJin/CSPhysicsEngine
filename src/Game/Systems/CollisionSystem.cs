@@ -34,8 +34,6 @@ namespace Game.System
 					result_case += result;
 				}
 			}
-			
-			Console.WriteLine("Collision Result Case : {0}", result_case);
 		}
 		
 		public override void OnCreate() {}

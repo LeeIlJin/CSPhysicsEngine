@@ -14,6 +14,8 @@ namespace Game.Component
 		
 		public bool fix_angle;
 		
+		public Vector2 to_correction_position;
+		
 		public Rigidbody Mass(float factor){ factor = 1.0f / UMath.Max(factor,0.0001f); return this;}
 		public Rigidbody Gravity(float factor){ gravity_factor = factor * 9.81f; return this; }
 		public Rigidbody Drag(float factor){ drag_factor = factor; return this; }
@@ -30,8 +32,9 @@ namespace Game.Component
 				mass_inv = 1.0f,
 				gravity_factor = 9.81f,
 				drag_factor = 0.1f,
-				angular_drag_factor = 0.01f,
-				fix_angle = false
+				angular_drag_factor = 0.1f,
+				fix_angle = false,
+				to_correction_position = new Vector2(0.0f,0.0f)
 			};
 		}
 		

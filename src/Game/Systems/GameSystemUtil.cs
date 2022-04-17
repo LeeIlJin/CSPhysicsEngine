@@ -8,9 +8,9 @@ namespace Game.System
 		public static void TransformCollider(ref Component.Transform t, ref Component.Collider c , Vector2 velocity, float angular_velocity)
 		{
 			Vector2 pos = t.position + velocity;
-			float angle = t.angle + angular_velocity;
+			float rad = t.radian + angular_velocity;
 			
-			c.transformed_vertices = GetColliderVertices(c, pos, t.scale, angle);
+			c.transformed_vertices = GetColliderVertices(c, pos, t.scale, rad);
 			
 			c.transformed_center = c.center + t.position;
 			

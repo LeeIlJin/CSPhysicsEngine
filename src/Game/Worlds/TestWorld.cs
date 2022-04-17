@@ -24,7 +24,7 @@ namespace Game
 			system_colorPolygon = new System.ColorPolygon(Draw, camera);
 			system_colorCircle = new System.ColorCircle(Draw, camera);
 			system_collision = new System.Collision();
-			system_rigidbody = new System.Rigidbody(Time.Delta);
+			system_rigidbody = new System.Rigidbody(1);
 			
 			Input.AddKeys(Keys.Up, Keys.Down, Keys.Right, Keys.Left, Keys.Q, Keys.W);
 		}
@@ -39,7 +39,7 @@ namespace Game
 			Vector2 position, scale;
 			Vector2[] vertices;
 			
-			for(int i=0; i<8; i++)
+			for(int i=0; i<20; i++)
 			{
 				//Byte[] col = URandom.Bytes(3);
 				
@@ -70,8 +70,8 @@ namespace Game
 			player = factory.CreateEntity(at);
 			
 			at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon),typeof(Component.Collider));
-			position = new Vector2(0.0f,-3.5f);
-			scale = new Vector2(100.0f,1.0f);
+			position = new Vector2(0.0f,-8.5f);
+			scale = new Vector2(200.0f,10.0f);
 			
 			vertices = new Vector2[4];
 			vertices[0] = new Vector2(-0.5f, -0.5f);
@@ -125,11 +125,11 @@ namespace Game
 				transform.position.y -= speed * Time.Delta();
 			
 			if(Input.IsKeyPress(Keys.Q))
-				transform.angle += anglespeed * Time.Delta();
+				transform.radian += anglespeed * Time.Delta();
 			if(Input.IsKeyPress(Keys.W))
-				transform.angle -= anglespeed * Time.Delta();
+				transform.radian -= anglespeed * Time.Delta();
 			
-			transform.angle = UMath.ClampAngle(transform.angle);
+			//transform.angle = UMath.ClampAngle(transform.angle);
 			
 			player.SetComponent<Component.Transform>(ecs_manager, transform);
 		}

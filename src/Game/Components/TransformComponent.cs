@@ -6,11 +6,11 @@ namespace Game.Component
 	{
 		public Vector2 position;
 		public Vector2 scale;
-		public float angle;
+		public float radian;
 		
 		public float size{ get{ return UMath.Max(scale.x,scale.y); } }
 		
-		public void Angle(float _angle){ angle = UMath.Repeat(_angle,0.0f,360.0f); }
+		public void Angle(float _angle){ radian = UMath.D2R * _angle; }
 		
 		public static Transform Create(Vector2 _position, Vector2 _scale, float _angle)
 		{
@@ -18,7 +18,7 @@ namespace Game.Component
 			{
 				position = _position,
 				scale = _scale,
-				angle = _angle
+				radian = UMath.D2R * _angle
 			};
 		}
 		
