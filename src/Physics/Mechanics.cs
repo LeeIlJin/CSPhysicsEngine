@@ -62,45 +62,52 @@ public static class Mechanics
 		return velocity + Vector2.Cross(angular_velocity, relative);
 	}
 	
+	/*
+	 real raCrossN = Cross( ra, normal );
+    real rbCrossN = Cross( rb, normal );
+    real invMassSum = A->im + B->im + Sqr( raCrossN ) * A->iI + Sqr( rbCrossN ) * B->iI;
+	
+	*/
+	
 	
 	//	Scalar J
 	public static float CalcImpulseScalar(float e, float aInv_mass, float aInv_inertia, float bInv_mass, float bInv_inertia,
-										  Vector2 normal, Vector2 velocity_AToB, Vector2 r_AToP, Vector2 r_BToP)
+										  Vector2 normal, Vector2 velocity_AToB, Vector2 r_AToP, Vector2 r_BToP, float contact_count = 1)
 	{
 		float temp = Vector2.Dot(velocity_AToB, normal);
-		if(temp >= 0.0f)
+		if(temp > 0.0f)
 			return 0.0f;
-		float up = temp * -(1.0f + e);
+		float up = -(1.0f + e) * temp;
 		
-		temp = aInv_inertia * Vector2.Cross(r_AToP, normal);
-		Vector2 a_down = Vector2.Cross(temp, r_AToP);
+		temp = Vector2.Cross(r_AToP, normal);
+		float a_down = UMath.Pow2(temp) * aInv_inertia;
 		
-		temp = bInv_inertia * Vector2.Cross(r_BToP, normal);
-		Vector2 b_down = Vector2.Cross(temp, r_BToP);
+		temp = Vector2.Cross(r_BToP, normal);
+		float b_down = UMath.Pow2(temp) * bInv_inertia;
 		
-		float down = aInv_mass + bInv_mass;
-		down += Vector2.Dot(a_down + b_down, normal);
+		float down = aInv_mass + bInv_mass + a_down + b_down;
 		
-		return (up / down);
+		return (up / down) / contact_count;
 	}
 	
-	public static Vector2 CalcLinearVelocity(float impulse_scalar, float inv_mass, Vector2 normal)
+	public static Vector2 CalcLinearVelocity(Vector2 impulse_vector, float inv_mass)
 	{
-		return normal * (impulse_scalar * inv_mass);
+		return impulse_vector * inv_mass;
 	}
 	
-	public static float CalcAngularVelocity(float impulse_scalar, float inv_inertia, Vector2 r_CToP, Vector2 normal)
+	public static float CalcAngularVelocity(Vector2 impulse_vector, float inv_inertia, Vector2 r_CToP)
 	{
-		float d = Vector2.Cross(r_CToP, normal * impulse_scalar);
+		float d = Vector2.Cross(r_CToP, impulse_vector);
 		return d * inv_inertia;
 	}
 	
-	public static Vector2 CalcFriction(float e, float impulse_scalar, float aInv_mass, float aStatic_friction, float aDynamic_friction, float bInv_mass, float bStatic_friction, float bDynamic_friction, Vector2 normal, Vector2 velocity_AToB)
+	public static Vector2 CalcFriction(float e, float impulse_scalar, float aInv_mass, float aStatic_friction, float aDynamic_friction, float bInv_mass, float bStatic_friction, float bDynamic_friction, Vector2 normal, Vector2 velocity_AToB, float contact_count = 1)
 	{
 		Vector2 tangent = velocity_AToB - normal * Vector2.Dot(velocity_AToB,normal);
 		tangent.SetNormalize();
 		float jt = -(1.0f + e) * Vector2.Dot(velocity_AToB,tangent);
-		jt = jt / (aInv_mass + bInv_mass);
+		jt /= (aInv_mass + bInv_mass);
+		jt /= contact_count;
 		
 		float mu = aStatic_friction * aStatic_friction + bStatic_friction * bStatic_friction;
 		Vector2 frictionImpulse;

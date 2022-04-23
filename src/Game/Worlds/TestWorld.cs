@@ -24,7 +24,7 @@ namespace Game
 			system_colorPolygon = new System.ColorPolygon(Draw, camera);
 			system_colorCircle = new System.ColorCircle(Draw, camera);
 			system_collision = new System.Collision();
-			system_rigidbody = new System.Rigidbody(1);
+			system_rigidbody = new System.Rigidbody(2);
 			
 			Input.AddKeys(Keys.Up, Keys.Down, Keys.Right, Keys.Left, Keys.Q, Keys.W);
 		}
@@ -39,17 +39,17 @@ namespace Game
 			Vector2 position, scale;
 			Vector2[] vertices;
 			
-			for(int i=0; i<20; i++)
+			for(int i=0; i<5; i++)
 			{
 				//Byte[] col = URandom.Bytes(3);
 				
 				position = URandom.Vector2(-10.0f,10.0f);
-				position.y = URandom.Float(-3.0f,5.0f);
+				position.y = URandom.Float(0.0f,15.0f);
 				//Vector2 scale = new Vector2(1.0f,1.0f);
 				//float angle = URandom.Float(360.0f);
 				
 				//Vector2 position = new Vector2(i * 0.5f - 1.0f, 0.3f);
-				scale = new Vector2(3.0f,2.0f);
+				scale = URandom.Vector2(2.0f,5.0f);
 				float angle = 5.0f;
 				
 				vertices = new Vector2[4];
@@ -66,9 +66,8 @@ namespace Game
 					Component.Collider.Polygon(vertices),
 					Component.Rigidbody.Create()
 				);
-				factory.CreateEntity(at);
+				player = factory.CreateEntity(at);
 			}
-			player = factory.CreateEntity(at);
 			
 			at = new ECS.Archetype(typeof(Component.Transform),typeof(Component.ColorPolygon),typeof(Component.Collider));
 			position = new Vector2(0.0f,-8.5f);
@@ -84,7 +83,7 @@ namespace Game
 			(
 				at,
 				Component.Transform.Create(position,scale,0.0f),
-				Component.ColorPolygon.Create(255,255,0,255,vertices),
+				Component.ColorPolygon.Create(255,185,185,255,vertices),
 				Component.Collider.Polygon(vertices)
 			);
 			factory.CreateEntity(at);
