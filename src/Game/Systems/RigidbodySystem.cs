@@ -61,6 +61,7 @@ namespace Game.System
 				//	=========================================================================
 				//	Initialize And PreApply
 				//	=========================================================================
+				Console.Clear();
 				for(int i=0; i<Length; i++)
 				{
 					array2[indices2[i]].results.Clear();
@@ -73,6 +74,10 @@ namespace Game.System
 					
 					//	Angular Drag Apply
 					array3.datas[indices3[i]].angular_velocity += Mechanics.CalcAngularDrag(array3.datas[indices3[i]].angular_drag_factor, array3.datas[indices3[i]].angular_velocity) * delta;
+					
+					
+					Console.WriteLine("Rigidbody [{0}] : Velocity({1:0.000} , {2:0.000}) : Angular({3:0.000})",i,array3.datas[indices3[i]].velocity.x, array3.datas[indices3[i]].velocity.y, array3.datas[indices3[i]].angular_velocity);
+					
 					
 					//	Velocity Apply
 					array1.datas[indices1[i]].position += array3.datas[indices3[i]].velocity * delta;
@@ -163,7 +168,7 @@ namespace Game.System
 					float a_angular_velocity, b_angular_velocity;
 					Vector2 a_velocity, b_velocity;
 					
-					float e = (array2.datas[node.ACollider].material.Bounciness + array2.datas[node.BCollider].material.Bounciness) / 2.0f;
+					float e = (array2.datas[node.ACollider].material.Bounciness + array2.datas[node.BCollider].material.Bounciness) * 0.5f;
 					
 					a_mass_inv = array3.datas[node.ARigidbody].mass_inv;
 					a_angular_velocity = array3.datas[node.ARigidbody].angular_velocity;

@@ -17,7 +17,7 @@ namespace Game.Resource
 		
 		public static PhysicsMaterial Default()
 		{
-			return new PhysicsMaterial(0.0f,0.6f,0.6f);
+			return new PhysicsMaterial(0.2f,0.6f,0.6f);
 		}
 	}
 }

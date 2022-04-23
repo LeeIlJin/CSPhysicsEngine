@@ -24,7 +24,7 @@ namespace Game
 			system_colorPolygon = new System.ColorPolygon(Draw, camera);
 			system_colorCircle = new System.ColorCircle(Draw, camera);
 			system_collision = new System.Collision();
-			system_rigidbody = new System.Rigidbody(2);
+			system_rigidbody = new System.Rigidbody(1);
 			
 			Input.AddKeys(Keys.Up, Keys.Down, Keys.Right, Keys.Left, Keys.Q, Keys.W);
 		}
