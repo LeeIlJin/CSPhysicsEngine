@@ -51,28 +51,37 @@ public static class Mechanics
 	}
 	*/
 	
+	//	This is the formula for the sphere used, But I wanted simplification. :3
+	public static float CalcInverseInertiaAtContactPoint(float inv_mass, Vector2 relative)
+	{
+		return 2.0f * inv_mass / relative.LengthSquared();
+	}
+	
+	public static Vector2 CalcTotalVelocityAtContactPoint(Vector2 velocity, float angular_velocity, Vector2 relative)
+	{
+		return velocity + Vector2.Cross(angular_velocity, relative);
+	}
+	
+	
 	//	Scalar J
 	public static float CalcImpulseScalar(float e, float aInv_mass, float aInv_inertia, float bInv_mass, float bInv_inertia,
 										  Vector2 normal, Vector2 velocity_AToB, Vector2 r_AToP, Vector2 r_BToP)
 	{
 		float temp = Vector2.Dot(velocity_AToB, normal);
-		if(temp == 0.0f)
+		if(temp >= 0.0f)
 			return 0.0f;
 		float up = temp * -(1.0f + e);
 		
+		temp = aInv_inertia * Vector2.Cross(r_AToP, normal);
+		Vector2 a_down = Vector2.Cross(temp, r_AToP);
+		
+		temp = bInv_inertia * Vector2.Cross(r_BToP, normal);
+		Vector2 b_down = Vector2.Cross(temp, r_BToP);
+		
 		float down = aInv_mass + bInv_mass;
+		down += Vector2.Dot(a_down + b_down, normal);
 		
-		Vector2 a = r_AToP * aInv_inertia;
-		Vector2 b = normal * aInv_inertia;
-		Vector2 ai = Vector2.TripleProduct(a,b,r_AToP);
-		
-		a = r_BToP * bInv_inertia;
-		Vector2 bi = Vector2.TripleProduct(a,b,r_BToP);
-		
-		float d = Vector2.Dot(ai + bi,normal);
-		down += d;
-		
-		return up / down;
+		return (up / down);
 	}
 	
 	public static Vector2 CalcLinearVelocity(float impulse_scalar, float inv_mass, Vector2 normal)
@@ -111,7 +120,13 @@ public static class Mechanics
 	
 	public static float CalcAngularDrag(float drag_factor, float angular_velocity, float face = 1.0f, float pop = 1.0f)
 	{
-		float sign = Math.Sign(angular_velocity);
+		float sign = 0.0f;
+		
+		if(angular_velocity > 0.0f)
+			sign = 1.0f;
+		else if(angular_velocity < 0.0f)
+			sign = -1.0f;
+		
 		return sign * (pop * angular_velocity * angular_velocity * face * drag_factor * -0.5f);
 	}
 }

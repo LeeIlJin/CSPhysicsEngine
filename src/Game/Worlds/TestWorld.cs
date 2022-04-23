@@ -43,12 +43,13 @@ namespace Game
 			{
 				//Byte[] col = URandom.Bytes(3);
 				
-				position = URandom.Vector2(-3.0f,3.0f);
+				position = URandom.Vector2(-10.0f,10.0f);
+				position.y = URandom.Float(-3.0f,5.0f);
 				//Vector2 scale = new Vector2(1.0f,1.0f);
 				//float angle = URandom.Float(360.0f);
 				
 				//Vector2 position = new Vector2(i * 0.5f - 1.0f, 0.3f);
-				scale = new Vector2(1.5f,1.0f);
+				scale = new Vector2(3.0f,2.0f);
 				float angle = 5.0f;
 				
 				vertices = new Vector2[4];

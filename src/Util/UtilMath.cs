@@ -69,11 +69,7 @@ public static class UMath
 	
 	public static float RepeatRadian(float rad)
 	{
-		if(rad < 0.0f)
-			return rad + PI2;
-		if(rad >= PI2)
-			return rad - PI2;
-		return rad;
+		return Repeat(rad, 0.0f, PI2);
 	}
 	
 	public static float Lerp(float p1, float p2, float r)

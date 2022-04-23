@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 
+// https://github.com/tutsplus/ImpulseEngine
+
+
 namespace Game.System
 {
 	public sealed class Rigidbody : ECS.SystemBase<Component.Transform, Component.Collider, Component.Rigidbody>
@@ -40,7 +43,7 @@ namespace Game.System
 			collisionResolveInfos = new List<CollisionResolveInfo>();
 			collisionApplyInfos = new List<CollisionApplyInfo>();
 			
-			positional_correction_percent = 0.5f;
+			positional_correction_percent = 0.2f;
 			positional_correction_slop = 0.01f;
 			
 			timer = new TickTimer();
@@ -56,7 +59,9 @@ namespace Game.System
 				timer.End();
 				float delta = timer.tick_s;
 				
-				collisionResolveInfos.Clear();
+				//	=========================================================================
+				//	Initialize And PreApply
+				//	=========================================================================
 				for(int i=0; i<Length; i++)
 				{
 					array2[indices2[i]].results.Clear();
@@ -66,23 +71,32 @@ namespace Game.System
 					array3.datas[indices3[i]].velocity.y -= array3.datas[indices3[i]].mass_inv * array3.datas[indices3[i]].gravity_factor * delta;
 					
 					//	Drag Apply
-					//Vector2 CalcDrag(float drag_factor, Vector2 velocity, float face = 1.0f, float pop = 1.0f)
 					array3.datas[indices3[i]].velocity += Mechanics.CalcDrag(array3.datas[indices3[i]].drag_factor, array3.datas[indices3[i]].velocity) * delta;
 					
 					//	Angular Drag Apply
 					array3.datas[indices3[i]].angular_velocity += Mechanics.CalcAngularDrag(array3.datas[indices3[i]].angular_drag_factor, array3.datas[indices3[i]].angular_velocity) * delta;
 					
+					//	Velocity Apply
+					array1.datas[indices1[i]].position += array3.datas[indices3[i]].velocity * delta;
+					
+					//	Angular Velocity Apply
+					array1.datas[indices1[i]].radian = UMath.RepeatRadian(array1.datas[indices1[i]].radian + array3.datas[indices3[i]].angular_velocity * delta);
 					
 					
-					if(test == testCase - 1)
-						Game.System.Util.TransformCollider(ref array1.datas[indices1[i]], ref array2.datas[indices2[i]], Vector2.Zero, 0.0f);
-					else
-						Game.System.Util.TransformCollider(ref array1.datas[indices1[i]], ref array2.datas[indices2[i]], array3.datas[indices3[i]].velocity * delta, array3.datas[indices3[i]].angular_velocity * delta);
+					// if(test == testCase - 1)
+					// 	Game.System.Util.TransformCollider(ref array1.datas[indices1[i]], ref array2.datas[indices2[i]], Vector2.Zero, 0.0f);
+					// else
+					// 	Game.System.Util.TransformCollider(ref array1.datas[indices1[i]], ref array2.datas[indices2[i]], array3.datas[indices3[i]].velocity * delta, array3.datas[indices3[i]].angular_velocity * delta);
+					
+					Game.System.Util.TransformCollider(ref array1.datas[indices1[i]], ref array2.datas[indices2[i]], Vector2.Zero, 0.0f);
 					
 				}
 				
 				
+				//	=========================================================================
 				//	Collider vs Rigidbody
+				//	=========================================================================
+				collisionResolveInfos.Clear();
 				for(int i=0; i<array2.datas.Length; i++)
 				{
 					if(array2.datas[i].have_rigidbody)
@@ -115,7 +129,9 @@ namespace Game.System
 				
 				
 				
+				//	=========================================================================
 				//	Rigidbody vs Rigidbody
+				//	=========================================================================
 				for(int i=0; i<Length-1; i++)
 				{
 					for(int j=i+1; j<Length; j++)
@@ -141,15 +157,15 @@ namespace Game.System
 				}
 				
 				
+				//	=========================================================================
 				//	Calc Collision Resolve
+				//	=========================================================================
 				collisionApplyInfos.Clear();
 				for(int i=0; i<collisionResolveInfos.Count; i++)
 				{
 					CollisionResolveInfo node = collisionResolveInfos[i];
 					
 					float a_mass_inv, b_mass_inv;
-					float a_inertia_inv, b_inertia_inv;
-					Vector2 velocity_ab;	// B Velocity - A Velocity
 					float a_angular_velocity, b_angular_velocity;
 					Vector2 a_velocity, b_velocity;
 					
@@ -163,27 +179,28 @@ namespace Game.System
 					{
 						b_mass_inv = 1.0f;
 						b_angular_velocity = 0.0f;
-						//velocity_ab = array3.datas[node.ARigidbody].velocity.negate;
 						b_velocity = Vector2.Zero;
 					} // B Is Not Rigidbody
 					else
 					{
 						b_mass_inv = array3.datas[node.BRigidbody].mass_inv;
 						b_angular_velocity = array3.datas[node.BRigidbody].angular_velocity;
-						//velocity_ab = array3.datas[node.BRigidbody].velocity - array3.datas[node.ARigidbody].velocity;
 						b_velocity = array3.datas[node.BRigidbody].velocity;
 					} // B Is Rigidbody
 					
 					
-					//=================================================================================
-					
+					//	=========================================================================
+					//	Solve Results
+					//	=========================================================================
 					List<Component.CollisionResult> results = array2.datas[node.ACollider].results;
 					for(int j=0; j<results.Count; j++)
 					{
 						Vector2 relative_ap;	// Contact Point - A Center Position
 						Vector2 relative_bp;	// Contact Point - B Center Position
 						
-						Vector2 correction = results[j].normal * ((UMath.Max(results[j].depth - positional_correction_slop, 0.0f) / (a_mass_inv + b_mass_inv)) * positional_correction_percent);
+						Vector2 normal = results[j].normal.normalize;
+						
+						Vector2 correction = normal * ((UMath.Max(results[j].depth - positional_correction_slop, 0.0f) / (a_mass_inv + b_mass_inv)) * positional_correction_percent);
 						array3.datas[node.ARigidbody].to_correction_position += correction.negate * a_mass_inv;
 						if(node.BRigidbody >= 0)
 						{
@@ -200,13 +217,15 @@ namespace Game.System
 							relative_ap = results[j].contact_points[k].point - array2.datas[node.ACollider].transformed_center;
 							relative_bp = results[j].contact_points[k].point - array2.datas[node.BCollider].transformed_center;
 							
-							a_inertia_inv = a_mass_inv / relative_ap.LengthSquared();
-							b_inertia_inv = b_mass_inv / relative_bp.LengthSquared();
+							float a_inertia_inv = Mechanics.CalcInverseInertiaAtContactPoint(a_mass_inv, relative_ap);
+							float b_inertia_inv = Mechanics.CalcInverseInertiaAtContactPoint(b_mass_inv, relative_bp);
 							
+							Vector2 a_total_velocity = Mechanics.CalcTotalVelocityAtContactPoint(a_velocity, a_angular_velocity, relative_ap);
+							Vector2 b_total_velocity = Mechanics.CalcTotalVelocityAtContactPoint(b_velocity, b_angular_velocity, relative_bp);
 							
-							velocity_ab = (b_velocity + (relative_bp.left * b_angular_velocity)) - (a_velocity + (relative_ap.left * a_angular_velocity));
+							Vector2 velocity_ab = b_total_velocity - a_total_velocity;
 							
-							if(Mechanics.GetRelativeStateOfBodies(velocity_ab, results[j].normal) != Mechanics.RelativeState.Smashing)
+							if(Mechanics.GetRelativeStateOfBodies(velocity_ab, normal) != Mechanics.RelativeState.Smashing)
 								continue;
 							
 							/*
@@ -218,13 +237,23 @@ namespace Game.System
 							
 							//Vector2 penetrationNormal = results[j].normal * results[j].contact_points[k].depth;
 							
-							float impulse = Mechanics.CalcImpulseScalar(e, a_mass_inv, a_inertia_inv, b_mass_inv, b_inertia_inv, results[j].normal, velocity_ab, relative_ap, relative_bp);
-							Vector2 friction = Mechanics.CalcFriction(e, impulse, a_mass_inv, array2.datas[node.ACollider].material.StaticFriction, array2.datas[node.ACollider].material.DynamicFriction, b_mass_inv, array2.datas[node.ACollider].material.StaticFriction, array2.datas[node.ACollider].material.DynamicFriction, results[j].normal, velocity_ab);
+							float impulse = Mechanics.CalcImpulseScalar(e, a_mass_inv, a_inertia_inv, b_mass_inv, b_inertia_inv, normal, velocity_ab, relative_ap, relative_bp) / (float)results[j].contact_points.Length;
+							
+							
+							Vector2 friction = Mechanics.CalcFriction(e, impulse, a_mass_inv, array2.datas[node.ACollider].material.StaticFriction, array2.datas[node.ACollider].material.DynamicFriction, b_mass_inv, array2.datas[node.ACollider].material.StaticFriction, array2.datas[node.ACollider].material.DynamicFriction, normal, velocity_ab) / (float)results[j].contact_points.Length;
+							
+							
+							Vector2 all_velocity = a_total_velocity + b_total_velocity;
+							float all_force = all_velocity.length;
+							
+							Console.WriteLine("Total : {0:0.000}",all_force);
+							//Console.WriteLine("Impulse : {0:0.000}",impulse);
+							
 							
 							//	Vector2 CalcLinearVelocity(float impulse_scalar, float inv_mass, Vector2 normal)
-							Vector2 linear_velocity = Mechanics.CalcLinearVelocity(impulse, a_mass_inv, results[j].normal.negate);
+							Vector2 linear_velocity = Mechanics.CalcLinearVelocity(impulse, a_mass_inv, normal.negate);
 							//	float CalcAngularVelocity(float impulse_scalar, float inv_inertia, Vector2 r_CToP, Vector2 normal)
-							float angular_velocity = Mechanics.CalcAngularVelocity(impulse, a_inertia_inv, relative_ap, results[j].normal.negate);
+							float angular_velocity = Mechanics.CalcAngularVelocity(impulse, a_inertia_inv, relative_ap, normal.negate);
 							
 							
 							
@@ -242,8 +271,8 @@ namespace Game.System
 							
 							if(node.BRigidbody >= 0)
 							{
-								linear_velocity = Mechanics.CalcLinearVelocity(impulse, b_mass_inv, results[j].normal);
-								angular_velocity = Mechanics.CalcAngularVelocity(impulse, b_inertia_inv, relative_bp, results[j].normal);
+								linear_velocity = Mechanics.CalcLinearVelocity(impulse, b_mass_inv, normal);
+								angular_velocity = Mechanics.CalcAngularVelocity(impulse, b_inertia_inv, relative_bp, normal);
 								
 								collisionApplyInfos.Add
 								(
@@ -260,12 +289,17 @@ namespace Game.System
 							
 							
 						}
+						
+						
+						
 					}
 				}
 				
 				
 				
+				//	=========================================================================
 				//	Apply Resolve Result
+				//	=========================================================================
 				for(int i=0; i<collisionApplyInfos.Count; i++)
 				{
 					// Apply it!
@@ -278,11 +312,13 @@ namespace Game.System
 					//Console.WriteLine("Apply Angular : {0}",collisionApplyInfos[i].AngularVelocity);
 				}
 				
+				
+				//	=========================================================================
+				//	Apply To Position And Angle
+				//	=========================================================================
 				for(int i=0; i<Length; i++)
 				{
 					array1.datas[indices1[i]].position += array3.datas[indices3[i]].to_correction_position;
-					array1.datas[indices1[i]].position += array3.datas[indices3[i]].velocity * delta;
-					array1.datas[indices1[i]].radian = UMath.RepeatRadian(array1.datas[indices1[i]].radian + array3.datas[indices3[i]].angular_velocity * delta);
 				}
 				
 				timer.Begin();

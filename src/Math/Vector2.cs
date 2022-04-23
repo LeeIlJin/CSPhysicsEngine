@@ -42,6 +42,8 @@ public struct Vector2
 	
 	public static float Dot(Vector2 a, Vector2 b){ return (a.x * b.x) + (a.y * b.y); }
 	public static float Cross(Vector2 a, Vector2 b){ return (a.x * b.y) - (a.y * b.x); }
+	public static Vector2 Cross(Vector2 a, float b){ return new Vector2(b * a.y, -b * a.x); }
+	public static Vector2 Cross(float a, Vector2 b){ return new Vector2(-a * b.y, a * b.x); }
 	public static Vector2 TripleProduct(Vector2 a, Vector2 b, Vector2 c) //	(A X B) X C
 	{
 		float ac = Vector2.Dot(a,c);
