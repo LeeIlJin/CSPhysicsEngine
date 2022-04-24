@@ -61,10 +61,12 @@ namespace Game.System
 				//	=========================================================================
 				//	Initialize And PreApply
 				//	=========================================================================
-				Console.Clear();
+				//Console.Clear();
 				for(int i=0; i<Length; i++)
 				{
 					array2[indices2[i]].results.Clear();
+					
+					Console.WriteLine("mass : {0} / inertia : {1}",array3.datas[indices3[i]].mass_inv,array3.datas[indices3[i]].inertia_inv);
 					
 					//	Gravity Apply
 					array3.datas[indices3[i]].velocity.y -= array3.datas[indices3[i]].mass_inv * array3.datas[indices3[i]].gravity_factor * delta;
@@ -76,7 +78,7 @@ namespace Game.System
 					array3.datas[indices3[i]].angular_velocity += Mechanics.CalcAngularDrag(array3.datas[indices3[i]].angular_drag_factor, array3.datas[indices3[i]].angular_velocity) * delta;
 					
 					
-					Console.WriteLine("Rigidbody [{0}] : Velocity({1:0.000} , {2:0.000}) : Angular({3:0.000})",i,array3.datas[indices3[i]].velocity.x, array3.datas[indices3[i]].velocity.y, array3.datas[indices3[i]].angular_velocity);
+					//Console.WriteLine("Rigidbody [{0}] : Velocity({1:0.000} , {2:0.000}) : Angular({3:0.000})",i,array3.datas[indices3[i]].velocity.x, array3.datas[indices3[i]].velocity.y, array3.datas[indices3[i]].angular_velocity);
 					
 					
 					//	Velocity Apply
@@ -165,24 +167,28 @@ namespace Game.System
 					CollisionResolveInfo node = collisionResolveInfos[i];
 					
 					float a_mass_inv, b_mass_inv;
+					float a_inertia_inv, b_inertia_inv;
 					float a_angular_velocity, b_angular_velocity;
 					Vector2 a_velocity, b_velocity;
 					
 					float e = (array2.datas[node.ACollider].material.Bounciness + array2.datas[node.BCollider].material.Bounciness) * 0.5f;
 					
 					a_mass_inv = array3.datas[node.ARigidbody].mass_inv;
+					a_inertia_inv = array3.datas[node.ARigidbody].inertia_inv;
 					a_angular_velocity = array3.datas[node.ARigidbody].angular_velocity;
 					a_velocity = array3.datas[node.ARigidbody].velocity;
 					
 					if(node.BRigidbody < 0) //	B Is Not Rigidbody
 					{
-						b_mass_inv = 1.0f;
+						b_mass_inv = 0.0f;
+						b_inertia_inv = 0.0f;
 						b_angular_velocity = 0.0f;
 						b_velocity = Vector2.Zero;
 					}
 					else //	B Is Rigidbody
 					{
 						b_mass_inv = array3.datas[node.BRigidbody].mass_inv;
+						b_inertia_inv = array3.datas[node.BRigidbody].inertia_inv;
 						b_angular_velocity = array3.datas[node.BRigidbody].angular_velocity;
 						b_velocity = array3.datas[node.BRigidbody].velocity;
 					}
@@ -218,8 +224,8 @@ namespace Game.System
 							Vector2 relative_ap = results[j].contact_points[k].point - array2.datas[node.ACollider].transformed_center;
 							Vector2 relative_bp = results[j].contact_points[k].point - array2.datas[node.BCollider].transformed_center;
 							
-							float a_inertia_inv = Mechanics.CalcInverseInertiaAtContactPoint(a_mass_inv, relative_ap);
-							float b_inertia_inv = Mechanics.CalcInverseInertiaAtContactPoint(b_mass_inv, relative_bp);
+							//float a_inertia_inv = Mechanics.CalcInverseInertiaAtContactPoint(a_mass_inv, relative_ap);
+							//float b_inertia_inv = Mechanics.CalcInverseInertiaAtContactPoint(b_mass_inv, relative_bp);
 							
 							Vector2 a_total_velocity = Mechanics.CalcTotalVelocityAtContactPoint(a_velocity, a_angular_velocity, relative_ap);
 							Vector2 b_total_velocity = Mechanics.CalcTotalVelocityAtContactPoint(b_velocity, b_angular_velocity, relative_bp);

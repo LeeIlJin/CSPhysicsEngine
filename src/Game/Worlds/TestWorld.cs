@@ -39,6 +39,13 @@ namespace Game
 			Vector2 position, scale;
 			Vector2[] vertices;
 			
+			Resource.PhysicsMaterial physicsMaterial = new Resource.PhysicsMaterial
+			{
+				Bounciness = 0.0f,
+				StaticFriction = 0.6f,
+				DynamicFriction = 0.6f
+			};
+			
 			for(int i=0; i<5; i++)
 			{
 				//Byte[] col = URandom.Bytes(3);
@@ -53,18 +60,18 @@ namespace Game
 				float angle = 5.0f;
 				
 				vertices = new Vector2[4];
-				vertices[0] = new Vector2(-0.5f, -0.5f);
-				vertices[1] = new Vector2(-0.5f, 0.5f);
-				vertices[2] = new Vector2(0.5f, 0.5f);
-				vertices[3] = new Vector2(0.5f, -0.5f);
+				vertices[0] = new Vector2(-1.0f, -1.0f);
+				vertices[1] = new Vector2(-1.0f, 1.0f);
+				vertices[2] = new Vector2(1.0f, 1.0f);
+				vertices[3] = new Vector2(1.0f, -1.0f);
 				
 				factory.SetComponentModels
 				(
 					at,
 					Component.Transform.Create(position,scale,angle),
 					Component.ColorPolygon.Create(255,0,255,0,vertices),
-					Component.Collider.Polygon(vertices),
-					Component.Rigidbody.Create()
+					Component.Collider.Polygon(vertices).Material(physicsMaterial),
+					Component.Rigidbody.Create().Density(1.0f, vertices)
 				);
 				player = factory.CreateEntity(at);
 			}

@@ -36,20 +36,40 @@ public static class Mechanics
 		return RelativeState.Leaving;
 	}
 	
-	public static float GetInverseInertia(Vector2 rotate_axis, Vector2 mass_center, float inv_mass)
+	public static float[] GetMassAndInertiaFromDensity(float density, Vector2[] vertices)
 	{
-		float r = Vector2.Distance(rotate_axis, mass_center);
-		return inv_mass / (r * r);
+		float area = 0.0f;
+		const float k_inv3 = 1.0f / 3.0f;
+		float I = 0.0f;
+		
+		for(int i=0; i<vertices.Length; ++i)
+		{
+			int j = ((i+1) < vertices.Length) ? i+1 : 0;
+			float d = Vector2.Cross(vertices[i], vertices[j]);
+			if(d < 0.0f)
+				d = -d;
+			area += 0.5f * d;
+			
+			float intx = vertices[i].x * vertices[i].x + vertices[i].x * vertices[j].x + vertices[j].x * vertices[j].x;
+			float inty = vertices[i].y * vertices[i].y + vertices[i].y * vertices[j].y + vertices[j].y * vertices[j].y;
+			
+			I += (0.25f * k_inv3 * d) * (intx + inty);
+		}
+		
+		float[] result = new float[2];
+		result[0] = area * density;
+		result[1] = I * density;
+		return result;
 	}
 	
-	/*
-	public static Vector2 TripleProduct(Vector2 a, Vector2 b, Vector2 c) //	(A X B) X C
+	public static float[] GetMassAndInertiaFromDensity(float density, float radius)
 	{
-		float ac = Vector2.Dot(a,c); (a.x * c.x) + (a.y * c.y)
-		float bc = Vector2.Dot(b,c); (b.x * c.x) + (b.y * c.y)
-		return b * ac - a * bc;
+		float[] result = new float[2];
+		float radiusSquared = radius * radius;
+		result[0] = UMath.PI * radiusSquared * density;
+		result[1] = result[0] * radiusSquared;
+		return result;
 	}
-	*/
 	
 	//	This is the formula for the sphere used, But I wanted simplification. :3
 	public static float CalcInverseInertiaAtContactPoint(float inv_mass, Vector2 relative)
