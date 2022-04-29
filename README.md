@@ -1,6 +1,6 @@
 # CSPhysicsEngine
   
-군대 싸지방에서 GoormIDE로 만들고 있습니다. (C++ 하고 싶다..)
+군대 싸지방에서 GoormIDE로 만들고 있습니다.
   
   
 ### How to use my ECS DOD
@@ -71,3 +71,5 @@ public class GSBoxColorRenderSystem : ECS.SystemBase<GCTransform,GCBoxMesh,GCCol
 ```
 
 https://dillinger.io/
+https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032?_ga=2.238349636.516193888.1650786156-150928275.1650786156
+https://github.com/tutsplus/ImpulseEngine
